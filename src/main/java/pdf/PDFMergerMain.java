@@ -13,7 +13,7 @@ public class PDFMergerMain {
 	public static void main(String[] args) {
 		File file = new File("D:/Personal/Cupido/Education.com/Worksheet/Generator");
 		File target = new File("D:/Personal/Cupido/Education.com/Worksheet/Generator/Merged.pdf");
-		PDFMergerExample pdfMergerExample = new PDFMergerExample();
+		PDFMerger pdfMerger = new PDFMerger();
 		List<InputStream> sources = new ArrayList<InputStream>();
 
 		for (File f : file.listFiles()) {
@@ -26,8 +26,7 @@ public class PDFMergerMain {
 		}
 
 		try {
-			InputStream merged = pdfMergerExample.merge(sources);
-			FileUtils.copyInputStreamToFile(merged, target);
+			pdfMerger.merge(sources, target, true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
