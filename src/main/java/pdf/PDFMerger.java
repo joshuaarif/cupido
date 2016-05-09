@@ -20,9 +20,13 @@ import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream.AppendMode;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.apache.xmpbox.schema.PDFAIdentificationSchema;
@@ -35,18 +39,21 @@ public class PDFMerger {
 	private String creator;
 	private String subject;
 	private String title;
+	private String footerImage;
 
 	public PDFMerger() {
 		this.title = "Cupido Creative worksheet";
 		this.creator = "www.cupidocreative.com";
 		this.subject = "Cupido Creative worksheet";
+		this.footerImage = "D:/Personal/Cupido/Education.com/Worksheet/Generator/Addition/index.jpg";
 	}
 
-	public PDFMerger(String title, String creator, String subject) {
+	public PDFMerger(String title, String creator, String subject, String footerImage) {
 		super();
 		this.title = title;
 		this.creator = creator;
 		this.subject = subject;
+		this.footerImage = footerImage;
 	}
 
 	public PDDocumentInformation createPDFDocumentInfo(String title, String creator, String subject,
@@ -114,7 +121,22 @@ public class PDFMerger {
 	public void merge(List<InputStream> sources, File target, boolean readOnly) throws IOException {
 		InputStream mergedPDFStream = mergeToStream(sources);
 
-		try (PDDocument pdDocument = PDDocument.load(mergedPDFStream)) {
+		try (PDDocument doc = PDDocument.load(mergedPDFStream)) {
+			// add image
+			for (PDPage page : doc.getPages()) {
+				PDImageXObject pdImage = PDImageXObject.createFromFile(footerImage, doc);
+				PDPageContentStream contentStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true);
+
+				// contentStream.drawImage(ximage, 20, 20 );
+				// better method inspired by
+				// http://stackoverflow.com/a/22318681/535646
+				// reduce this value if the image is too large
+				float scale = 1f;
+				contentStream.drawImage(pdImage, 0, 0, pdImage.getWidth() * scale, pdImage.getHeight() * scale);
+
+				contentStream.close();
+			}
+
 			int keyLength = 128;
 
 			AccessPermission accessPermission = new AccessPermission();
@@ -125,9 +147,9 @@ public class PDFMerger {
 			StandardProtectionPolicy spp = new StandardProtectionPolicy("12345", "", accessPermission);
 			spp.setEncryptionKeyLength(keyLength);
 			spp.setPermissions(accessPermission);
-			pdDocument.protect(spp);
+			doc.protect(spp);
 
-			pdDocument.save(target);
+			doc.save(target);
 		}
 	}
 
