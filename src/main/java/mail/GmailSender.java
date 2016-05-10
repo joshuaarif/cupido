@@ -21,6 +21,9 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -34,13 +37,14 @@ import com.google.api.client.util.Base64;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
-import com.google.api.services.gmail.model.Label;
-import com.google.api.services.gmail.model.ListLabelsResponse;
 import com.google.api.services.gmail.model.Message;
 
-public class GmailQuickstart {
+public class GmailSender {
+
+	private static final Log LOG = LogFactory.getLog(GmailSender.class);
+
 	/** Application name. */
-	private static final String APPLICATION_NAME = "Gmail API Java Quickstart";
+	private static final String APPLICATION_NAME = "Cupido Creative";
 
 	/** Directory to store user credentials for this application. */
 	private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
@@ -82,14 +86,14 @@ public class GmailQuickstart {
 	 */
 	public static Credential authorize() throws IOException {
 		// Load client secrets.
-		InputStream in = GmailQuickstart.class.getResourceAsStream("/client_secret_gmail.json");
+		InputStream in = GmailSender.class.getResourceAsStream("/client_secret_gmail.json");
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
 		// Build flow and trigger user authorization request.
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
 				clientSecrets, SCOPES).setDataStoreFactory(DATA_STORE_FACTORY).setAccessType("offline").build();
 		Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-		System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
+		LOG.debug("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
 		return credential;
 	}
 
@@ -223,9 +227,6 @@ public class GmailQuickstart {
 			throws MessagingException, IOException {
 		Message message = createMessageWithEmail(email);
 		message = service.users().messages().send(userId, message).execute();
-
-		System.out.println("Message id: " + message.getId());
-		System.out.println(message.toPrettyString());
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -234,25 +235,12 @@ public class GmailQuickstart {
 
 		// Print the labels in the user's account.
 		String user = "me";
-		// ListLabelsResponse listResponse =
-		// service.users().labels().list(user).execute();
-		// List<Label> labels = listResponse.getLabels();
-		// if (labels.size() == 0) {
-		// System.out.println("No labels found.");
-		// } else {
-		// System.out.println("Labels:");
-		// for (Label label : labels) {
-		// System.out.printf("- %s\n", label.getName());
-		// }
-		// }
-
-		// send simple mail
 
 		try {
-			System.out.println("Sending");
+			LOG.info("Sending email");
 			MimeMessage email = createEmail("timotius.pamungkas@gmail.com", user, "Test Gmail", "Test GMail Java");
 			sendMessage(service, user, email);
-			System.out.println("Sent");
+			System.out.println("Email sent");
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
