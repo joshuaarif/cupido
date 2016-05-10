@@ -17,9 +17,18 @@ import com.google.common.collect.Sets;
 public class PDFWorkbookGenerator {
 	private static final Log LOG = LogFactory.getLog(PDFWorkbookGenerator.class);
 
+	/**
+	 * 
+	 * @param rootWorksheetFolder
+	 *            Directory to worksheet, eg : .../Addition/worksheet
+	 * @param targetFile
+	 *            file to generated
+	 * @param size
+	 *            number of worksheet
+	 */
 	public void generate(String rootWorksheetFolder, String targetFile, int size) {
-		File file = new File("D:/Personal/Cupido/Education.com/Worksheet/Generator/Addition/1-10/worksheet");
-		File target = new File("D:/Personal/Cupido/Education.com/Worksheet/Generator/Addition/1-10/Test.pdf");
+		File file = new File(rootWorksheetFolder);
+		File target = new File(targetFile);
 		PDFMerger pdfMerger = new PDFMerger();
 
 		// original file
@@ -41,9 +50,6 @@ public class PDFWorkbookGenerator {
 			randomSeed.add(randomIndex);
 		} while (randomSeed.size() < size);
 
-		LOG.info("Random seed " + randomSeed);
-
-		// get random x worksheet
 		for (int i : randomSeed) {
 			File worksheet = worksheetFiles.get(i);
 			File answer = getWorksheetAnswer(worksheet);
@@ -83,10 +89,9 @@ public class PDFWorkbookGenerator {
 		try {
 			pdfMerger.merge(sources, target, true);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 		}
-		LOG.info("Generating worksheet : DONE");
+		LOG.info("Generating worksheet : Done");
 	}
 
 	private static File getWorksheetAnswer(File worksheet) {
