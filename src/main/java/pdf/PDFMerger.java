@@ -45,7 +45,7 @@ public class PDFMerger {
 		this.title = "Cupido Creative worksheet";
 		this.creator = "www.cupidocreative.com";
 		this.subject = "Cupido Creative worksheet";
-		this.footerImage = "D:/Personal/Cupido/Education.com/Worksheet/Generator/Addition/index.jpg";
+		this.footerImage = "D:/Personal/Cupido/Education.com/Worksheet/Generator/Addition/footer.jpg";
 	}
 
 	public PDFMerger(String title, String creator, String subject, String footerImage) {
@@ -123,18 +123,22 @@ public class PDFMerger {
 
 		try (PDDocument doc = PDDocument.load(mergedPDFStream)) {
 			// add image
-			for (PDPage page : doc.getPages()) {
-				PDImageXObject pdImage = PDImageXObject.createFromFile(footerImage, doc);
-				PDPageContentStream contentStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true);
+			File imageFile = new File(footerImage);
 
-				// contentStream.drawImage(ximage, 20, 20 );
-				// better method inspired by
-				// http://stackoverflow.com/a/22318681/535646
-				// reduce this value if the image is too large
-				float scale = 1f;
-				contentStream.drawImage(pdImage, 0, 0, pdImage.getWidth() * scale, pdImage.getHeight() * scale);
+			if (imageFile.exists() && imageFile.isFile()) {
+				for (PDPage page : doc.getPages()) {
+					PDImageXObject pdImage = PDImageXObject.createFromFile(footerImage, doc);
+					PDPageContentStream contentStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true);
 
-				contentStream.close();
+					// contentStream.drawImage(ximage, 20, 20 );
+					// better method inspired by
+					// http://stackoverflow.com/a/22318681/535646
+					// reduce this value if the image is too large
+					float scale = 1f;
+					contentStream.drawImage(pdImage, 0, 0, pdImage.getWidth() * scale, pdImage.getHeight() * scale);
+
+					contentStream.close();
+				}
 			}
 
 			int keyLength = 128;
