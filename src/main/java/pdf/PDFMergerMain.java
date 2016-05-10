@@ -1,13 +1,8 @@
 package pdf;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 import mail.GmailSender;
 
@@ -15,8 +10,6 @@ public class PDFMergerMain {
 	// private static final Log LOG = LogFactory.getLog(PDFMergerMain.class);
 
 	public static void main(String[] args) {
-		PDFWorkbookGenerator generator = new PDFWorkbookGenerator();
-		GmailSender gmailSender = new GmailSender();
 		String rootWorksheetFolder1 = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Addition/1-10/worksheet";
 		String rootWorksheetFolder2 = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Subtraction/1-20/worksheet";
 		String targetFile1 = "D:/Personal/Cupido/Addition.pdf";
