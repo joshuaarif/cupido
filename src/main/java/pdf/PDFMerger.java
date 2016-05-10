@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
@@ -56,7 +55,7 @@ public class PDFMerger {
 		this.footerImage = footerImage;
 	}
 
-	public PDDocumentInformation createPDFDocumentInfo(String title, String creator, String subject,
+	private PDDocumentInformation createPDFDocumentInfo(String title, String creator, String subject,
 			Calendar creationDate) {
 		LOG.info("Setting document info (title, author, subject) for merged PDF");
 		PDDocumentInformation documentInformation = new PDDocumentInformation();
