@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -222,10 +223,8 @@ public class GmailSender {
 	 * @throws IOException
 	 */
 	public void sendMessage(Gmail service, String userId, MimeMessage email) throws MessagingException, IOException {
-		LOG.info("Sending message : " + email.getAllRecipients());
 		Message message = createMessageWithEmail(email);
 		message = service.users().messages().send(userId, message).execute();
-		LOG.info("Message sent");
 	}
 
 }

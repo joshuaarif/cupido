@@ -80,13 +80,16 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 		PDFWorkbookGenerator generator = new PDFWorkbookGenerator();
 		GmailSender gmailSender = new GmailSender();
 
+		LOG.info("Generate from " + size + " worksheets");
 		generator.generate(this.rootWorksheetFolderPath, this.targetFilePath, this.size);
 		try {
+			LOG.info("Sending mail to " + emailTo);
 			MimeMessage email = gmailSender.createEmailWithAttachment(this.emailTo, GMAIL_USER, this.emailSubject,
 					this.emailBody, new File(targetFilePath));
 			gmailSender.sendMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+			LOG.info("Mail sent to " + emailTo);
 		} catch (MessagingException | IOException e) {
-			LOG.error(e.getMessage());
+			LOG.error("Send mail to " + emailTo + " failed : " + e.getMessage());
 		}
 	}
 
