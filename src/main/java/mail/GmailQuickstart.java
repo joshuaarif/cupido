@@ -61,9 +61,8 @@ public class GmailQuickstart {
 	 * If modifying these scopes, delete your previously saved credentials at
 	 * ~/.credentials/gmail-java-quickstart.json
 	 */
-	private static final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_COMPOSE,
-			GmailScopes.GMAIL_INSERT, GmailScopes.GMAIL_MODIFY, GmailScopes.GMAIL_READONLY,
-			GmailScopes.MAIL_GOOGLE_COM);
+	private static final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_COMPOSE, GmailScopes.GMAIL_INSERT,
+			GmailScopes.GMAIL_MODIFY, GmailScopes.GMAIL_READONLY, GmailScopes.MAIL_GOOGLE_COM);
 
 	static {
 		try {
