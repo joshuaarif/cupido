@@ -1,6 +1,7 @@
 package mail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -122,8 +123,7 @@ public class GmailSender {
 	 * @return MimeMessage to be used to send email.
 	 * @throws MessagingException
 	 */
-	public static MimeMessage createEmail(String to, String from, String subject, String bodyText)
-			throws MessagingException {
+	public MimeMessage createEmail(String to, String from, String subject, String bodyText) throws MessagingException {
 		Properties props = new Properties();
 		Session session = Session.getDefaultInstance(props, null);
 
@@ -147,7 +147,7 @@ public class GmailSender {
 	 * @throws IOException
 	 * @throws MessagingException
 	 */
-	public static Message createMessageWithEmail(MimeMessage email) throws MessagingException, IOException {
+	public Message createMessageWithEmail(MimeMessage email) throws MessagingException, IOException {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		email.writeTo(bytes);
 		String encodedEmail = Base64.encodeBase64URLSafeString(bytes.toByteArray());
@@ -167,15 +167,13 @@ public class GmailSender {
 	 *            Subject of the email.
 	 * @param bodyText
 	 *            Body text of the email.
-	 * @param fileDir
-	 *            Path to the directory containing attachment.
-	 * @param filename
-	 *            Name of file to be attached.
+	 * @param attachment
+	 *            The attachment.
 	 * @return MimeMessage to be used to send email.
 	 * @throws MessagingException
 	 */
-	public static MimeMessage createEmailWithAttachment(String to, String from, String subject, String bodyText,
-			String fileDir, String filename) throws MessagingException, IOException {
+	public MimeMessage createEmailWithAttachment(String to, String from, String subject, String bodyText,
+			File attachment) throws MessagingException, IOException {
 		Properties props = new Properties();
 		Session session = Session.getDefaultInstance(props, null);
 
@@ -195,12 +193,12 @@ public class GmailSender {
 		multipart.addBodyPart(mimeBodyPart);
 
 		mimeBodyPart = new MimeBodyPart();
-		DataSource source = new FileDataSource(fileDir + filename);
+		DataSource source = new FileDataSource(attachment);
 
 		mimeBodyPart.setDataHandler(new DataHandler(source));
-		mimeBodyPart.setFileName(filename);
-		String contentType = Files.probeContentType(FileSystems.getDefault().getPath(fileDir, filename));
-		mimeBodyPart.setHeader("Content-Type", contentType + "; name=\"" + filename + "\"");
+		mimeBodyPart.setFileName(attachment.getName());
+		String contentType = Files.probeContentType(FileSystems.getDefault().getPath(attachment.getPath()));
+		mimeBodyPart.setHeader("Content-Type", contentType + "; name=\"" + attachment.getName() + "\"");
 		mimeBodyPart.setHeader("Content-Transfer-Encoding", "base64");
 
 		multipart.addBodyPart(mimeBodyPart);
@@ -223,28 +221,11 @@ public class GmailSender {
 	 * @throws MessagingException
 	 * @throws IOException
 	 */
-	public static void sendMessage(Gmail service, String userId, MimeMessage email)
-			throws MessagingException, IOException {
+	public void sendMessage(Gmail service, String userId, MimeMessage email) throws MessagingException, IOException {
+		LOG.info("Sending message : " + email.getAllRecipients());
 		Message message = createMessageWithEmail(email);
 		message = service.users().messages().send(userId, message).execute();
-	}
-
-	public static void main(String[] args) throws IOException {
-		// Build a new authorized API client service.
-		Gmail service = getGmailService();
-
-		// Print the labels in the user's account.
-		String user = "me";
-
-		try {
-			LOG.info("Sending email");
-			MimeMessage email = createEmail("timotius.pamungkas@gmail.com", user, "Test Gmail", "Test GMail Java");
-			sendMessage(service, user, email);
-			System.out.println("Email sent");
-		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		LOG.info("Message sent");
 	}
 
 }
