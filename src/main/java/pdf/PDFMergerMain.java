@@ -2,6 +2,7 @@ package pdf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
@@ -12,6 +13,10 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.compiler.CompiledST;
+
+import com.google.common.collect.Maps;
+
+import mail.EmailUtil;
 
 public class PDFMergerMain {
 	// private static final Log LOG = LogFactory.getLog(PDFMergerMain.class);
@@ -36,25 +41,19 @@ public class PDFMergerMain {
 		// executorService.submit(task1);
 		// executorService.submit(task2);
 
-		InputStream templateStream = PDFMergerMain.class.getClassLoader().getResourceAsStream("email_body.html");
+		executorService.shutdown();
+
+		EmailUtil emailUtil = new EmailUtil();
+		Map<String, String> emailValues = Maps.newHashMap();
+		emailValues.put("name", "Timotius");
+
 		try {
-			String myString = IOUtils.toString(templateStream, "UTF-8");
-			STGroup stGroup = new STGroup('$', '$');
-			stGroup.registerRenderer(String.class, new StringRenderer());
-			CompiledST compiledST = stGroup.defineTemplate("temp", myString);
-			compiledST.hasFormalArgs = false;
-
-			ST st = stGroup.getInstanceOf("temp");
-			st.add("name", "Test");
-
-			String x = st.render();
-			System.out.println(x);
+			String emailBody2 = emailUtil.createEmailBody("email_body.html", '$', emailValues);
+			System.out.println(emailBody2);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		executorService.shutdown();
 	}
 
 }
