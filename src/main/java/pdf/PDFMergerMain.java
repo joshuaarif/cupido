@@ -4,8 +4,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
-import mail.GmailSender;
-
 public class PDFMergerMain {
 	// private static final Log LOG = LogFactory.getLog(PDFMergerMain.class);
 
