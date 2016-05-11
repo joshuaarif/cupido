@@ -1,4 +1,4 @@
-package pdf;
+package com.cupidocreative.pdf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

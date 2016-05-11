@@ -1,4 +1,4 @@
-package pdf;
+package com.cupidocreative.pdf;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import mail.GmailSender;
+import com.cupidocreative.mail.GmailSender;
 
 public class PDFWorkbookGeneratorTask implements Runnable {
 

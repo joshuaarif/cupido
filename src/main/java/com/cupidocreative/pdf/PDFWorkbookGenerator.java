@@ -1,4 +1,4 @@
-package pdf;
+package com.cupidocreative.pdf;
 
 import java.io.File;
 import java.io.IOException;

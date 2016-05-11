@@ -1,4 +1,4 @@
-package mail;
+package com.cupidocreative.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +11,9 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.compiler.CompiledST;
 
-import pdf.PDFMergerMain;
+import com.cupidocreative.pdf.PDFMergerMain;
 
-public class EmailUtil {
+public class StringTemplateUtil {
 
 	/**
 	 * Create email body using StringTemplate
@@ -22,14 +22,14 @@ public class EmailUtil {
 	 *            path, relative to ClassLoader
 	 * @param delimiter
 	 *            delimiter for bound param
-	 * @param emailValues
+	 * @param values
 	 *            map contains values for bound param. Map key = param on
 	 *            template, Map value = replacement value for bound param
 	 * @return string with bound param replaced
 	 * @throws IOException
 	 *             if template can't be found
 	 */
-	public String createFromStringTemplate(String templatePath, char delimiter, Map<String, String> emailValues)
+	public String createFromST(String templatePath, char delimiter, Map<String, String> values)
 			throws IOException {
 		InputStream templateStream = PDFMergerMain.class.getClassLoader().getResourceAsStream(templatePath);
 
@@ -43,8 +43,8 @@ public class EmailUtil {
 
 		ST st = stGroup.getInstanceOf(tempGroup);
 
-		for (String key : emailValues.keySet()) {
-			String value = emailValues.get(key);
+		for (String key : values.keySet()) {
+			String value = values.get(key);
 			st.add(key, value);
 		}
 

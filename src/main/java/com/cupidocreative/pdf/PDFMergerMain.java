@@ -1,25 +1,14 @@
-package pdf;
+package com.cupidocreative.pdf;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.io.IOUtils;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
-import org.stringtemplate.v4.StringRenderer;
-import org.stringtemplate.v4.compiler.CompiledST;
-
-import com.google.common.collect.Maps;
-
-import mail.EmailUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PDFMergerMain {
-	// private static final Log LOG = LogFactory.getLog(PDFMergerMain.class);
+	private static final Log LOG = LogFactory.getLog(PDFMergerMain.class);
 
 	public static void main(String[] args) {
 		String rootWorksheetFolder1 = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Addition/1-10/worksheet";
@@ -38,22 +27,10 @@ public class PDFMergerMain {
 				emailSubject + ThreadLocalRandom.current().nextInt(), emailBody);
 
 		ExecutorService executorService = Executors.newFixedThreadPool(4);
-		// executorService.submit(task1);
-		// executorService.submit(task2);
+		executorService.submit(task1);
+		executorService.submit(task2);
 
 		executorService.shutdown();
-
-		EmailUtil emailUtil = new EmailUtil();
-		Map<String, String> emailValues = Maps.newHashMap();
-		emailValues.put("name", "Timotius");
-
-		try {
-			String emailBody2 = emailUtil.createEmailBody("email_body.html", '$', emailValues);
-			System.out.println(emailBody2);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }

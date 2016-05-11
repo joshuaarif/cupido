@@ -1,4 +1,4 @@
-package mail;
+package com.cupidocreative.mail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
