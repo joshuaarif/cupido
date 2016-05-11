@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.cupidocreative.domain.CCPurchaseOrder;
+import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.google.common.collect.Sets;
 
 public class XlsxReader {
@@ -51,8 +51,8 @@ public class XlsxReader {
 		return workbook;
 	}
 
-	public Set<CCPurchaseOrder> readOrderFromExcel(String excelFilePath) {
-		Set<CCPurchaseOrder> result = Sets.newLinkedHashSet();
+	public Set<PurchaseOrderHdr> readOrderFromExcel(String excelFilePath) {
+		Set<PurchaseOrderHdr> result = Sets.newLinkedHashSet();
 
 		try (FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
 				Workbook workbook = getWorkbook(inputStream, excelFilePath)) {
@@ -65,7 +65,7 @@ public class XlsxReader {
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
-				CCPurchaseOrder order = new CCPurchaseOrder();
+				PurchaseOrderHdr order = new PurchaseOrderHdr();
 
 				while (cellIterator.hasNext()) {
 					Cell nextCell = cellIterator.next();
