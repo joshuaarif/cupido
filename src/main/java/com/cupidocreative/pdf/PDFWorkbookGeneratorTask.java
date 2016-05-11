@@ -2,6 +2,9 @@ package com.cupidocreative.pdf;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -25,6 +28,7 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 	private String pdfCreator = "www.cupidocreative.com";
 	private String pdfSubject = "Buku Latihan Cupido Creative, lihat lengkapnya di www.cupidocreative.com";
 	private String pdfFooterImagePath;
+	private boolean deleteAfterProcess = false;
 
 	/**
 	 * Generate workbook and send mail as attachment
@@ -65,6 +69,22 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 		return emailTo;
 	}
 
+	public String getPdfCreator() {
+		return pdfCreator;
+	}
+
+	public String getPdfFooterImagePath() {
+		return pdfFooterImagePath;
+	}
+
+	public String getPdfSubject() {
+		return pdfSubject;
+	}
+
+	public String getPdfTitle() {
+		return pdfTitle;
+	}
+
 	public String getRootWorksheetFolderPath() {
 		return rootWorksheetFolderPath;
 	}
@@ -75,6 +95,10 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 
 	public String getTargetFilePath() {
 		return targetFilePath;
+	}
+
+	public boolean isDeleteAfterProcess() {
+		return deleteAfterProcess;
 	}
 
 	@Override
@@ -92,9 +116,17 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 					this.emailBody, new File(targetFilePath));
 			gmailSender.sendMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 			LOG.info("Mail sent to " + emailTo);
+
+			if (deleteAfterProcess) {
+				Files.deleteIfExists(FileSystems.getDefault().getPath(targetFilePath));
+			}
 		} catch (MessagingException | IOException e) {
 			LOG.error("Send mail to " + emailTo + " failed : " + e.getMessage());
 		}
+	}
+
+	public void setDeleteAfterProcess(boolean deleteAfterProcess) {
+		this.deleteAfterProcess = deleteAfterProcess;
 	}
 
 	public void setEmailBody(String emailBody) {
@@ -107,6 +139,22 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 
 	public void setEmailTo(String emailTo) {
 		this.emailTo = emailTo;
+	}
+
+	public void setPdfCreator(String pdfCreator) {
+		this.pdfCreator = pdfCreator;
+	}
+
+	public void setPdfFooterImagePath(String pdfFooterImagePath) {
+		this.pdfFooterImagePath = pdfFooterImagePath;
+	}
+
+	public void setPdfSubject(String pdfSubject) {
+		this.pdfSubject = pdfSubject;
+	}
+
+	public void setPdfTitle(String pdfTitle) {
+		this.pdfTitle = pdfTitle;
 	}
 
 	public void setRootWorksheetFolderPath(String rootWorksheetFolderPath) {
@@ -123,38 +171,6 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 		}
 
 		this.targetFilePath = targetFilePath;
-	}
-
-	public String getPdfTitle() {
-		return pdfTitle;
-	}
-
-	public void setPdfTitle(String pdfTitle) {
-		this.pdfTitle = pdfTitle;
-	}
-
-	public String getPdfCreator() {
-		return pdfCreator;
-	}
-
-	public void setPdfCreator(String pdfCreator) {
-		this.pdfCreator = pdfCreator;
-	}
-
-	public String getPdfSubject() {
-		return pdfSubject;
-	}
-
-	public void setPdfSubject(String pdfSubject) {
-		this.pdfSubject = pdfSubject;
-	}
-
-	public String getPdfFooterImagePath() {
-		return pdfFooterImagePath;
-	}
-
-	public void setPdfFooterImagePath(String pdfFooterImagePath) {
-		this.pdfFooterImagePath = pdfFooterImagePath;
 	}
 
 }
