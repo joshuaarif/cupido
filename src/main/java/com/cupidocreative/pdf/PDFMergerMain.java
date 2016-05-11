@@ -65,6 +65,7 @@ public class PDFMergerMain {
 
 			PDFWorkbookGeneratorTask task = new PDFWorkbookGeneratorTask(rootWorksheetFolderPath, targetFilePath, size,
 					emailTo, emailSubject, emailBody);
+			task.setDeleteTempPdfFile(true);
 			
 			executorService.submit(task);
 		});
