@@ -1,7 +1,8 @@
 package com.cupidocreative.pdf;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,47 +10,65 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.cupidocreative.domain.CCPurchaseOrder;
 import com.cupidocreative.util.StringTemplateUtil;
-import com.google.common.collect.Maps;
+import com.google.api.client.util.Maps;
+import com.google.common.collect.Sets;
 
 public class PDFMergerMain {
 	private static final Log LOG = LogFactory.getLog(PDFMergerMain.class);
 
+	private static final String ROOT_WORKSHEET_FOLDER_ADD = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Addition/1-10/worksheet";
+	private static final String ROOT_WORKSHEET_FOLDER_SUB = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Subtraction/1-20/worksheet";
+	private static final String TEMP_DIR = "D:/Personal/Cupido/PO";
+
 	public static void main(String[] args) {
-		String rootWorksheetFolder1 = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Addition/1-10/worksheet";
-		String rootWorksheetFolder2 = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Subtraction/1-20/worksheet";
-		String targetFile1 = "D:/Personal/Cupido/Addition footer1.pdf";
-		String targetFile2 = "D:/Personal/Cupido/Subtraction footer2.pdf";
+		// begin init
+		Set<CCPurchaseOrder> orders = Sets.newLinkedHashSet();
 
-		String emailTo = "timotius.pamungkas@gmail.com";
-		String emailSubject = "Email subject ";
-		String emailBody = "Email body";
+		for (int i = 0; i < 20; i++) {
+			CCPurchaseOrder order = new CCPurchaseOrder();
+			order.setEmail((i % 2 == 0 ? "timotius.pamungkas@gmail.com" : "timotius_pamungkas@yahoo.com"));
+			order.setPoNumber(Integer.toHexString(ThreadLocalRandom.current().nextInt(2000)).toUpperCase());
+			order.setWorkbookCode((i % 2 == 0 ? "ADDITION" : "SUBTRACTION"));
+			order.setWorkbookSize(1);
 
-		Map<String, String> values = Maps.newHashMap();
-
-		values.put("name", "Timotius");
-
-		try {
-			emailBody = StringTemplateUtil.createFromST("email_body.html", '$', values);
-			LOG.debug(emailBody);
-		} catch (IOException e) {
-			e.printStackTrace();
+			orders.add(order);
 		}
 
-		int size = 3;
+		File tempDir = new File(TEMP_DIR);
+		if (!tempDir.exists()) {
+			tempDir.mkdirs();
+		}
 
-		PDFWorkbookGeneratorTask task1 = new PDFWorkbookGeneratorTask(rootWorksheetFolder1, targetFile1, size, emailTo,
-				emailSubject + ThreadLocalRandom.current().nextInt(), emailBody);
-		PDFWorkbookGeneratorTask task2 = new PDFWorkbookGeneratorTask(rootWorksheetFolder2, targetFile2, size, emailTo,
-				emailSubject + ThreadLocalRandom.current().nextInt(), emailBody);
+		ExecutorService executorService = Executors.newFixedThreadPool(3);
+		
+		// start create from order
+		orders.forEach(o -> {
+			String rootWorksheetFolderPath = o.getWorkbookCode().equals("ADDITION") ? ROOT_WORKSHEET_FOLDER_ADD
+					: ROOT_WORKSHEET_FOLDER_SUB;
+			String targetFilePath = TEMP_DIR + "/" + o.getPoNumber();
+			int size = o.getWorkbookSize();
+			String emailTo = o.getEmail();
+			String emailSubject = "Order " + o.getPoNumber();
+			String emailBody = "Email body";
 
-		task1.setPdfFooterImagePath("D:/Personal/Cupido/footer.png");
-		task2.setPdfFooterImagePath("D:/Personal/Cupido/footer2.png");
+			Map<String, String> values = Maps.newHashMap();
+			values.put("name", o.getEmail());
+			
+			try {
+				emailBody = StringTemplateUtil.createFromST("email_body.html", '$', values);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-		ExecutorService executorService = Executors.newFixedThreadPool(4);
-		executorService.submit(task1);
-		executorService.submit(task2);
-
+			PDFWorkbookGeneratorTask task = new PDFWorkbookGeneratorTask(rootWorksheetFolderPath, targetFilePath, size,
+					emailTo, emailSubject, emailBody);
+			
+			executorService.submit(task);
+		});
+		
 		executorService.shutdown();
 	}
 

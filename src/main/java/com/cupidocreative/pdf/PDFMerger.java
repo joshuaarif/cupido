@@ -1,5 +1,6 @@
 package com.cupidocreative.pdf;
 
+import java.awt.image.ImageFilter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,9 +37,9 @@ import org.apache.xmpbox.xml.XmpSerializer;
 public class PDFMerger {
 	private static final Log LOG = LogFactory.getLog(PDFMerger.class);
 	private String creator;
+	private String footerImage;
 	private String subject;
 	private String title;
-	private String footerImage;
 
 	public PDFMerger(String title, String creator, String subject, String footerImagePath) {
 		super();
@@ -112,21 +113,19 @@ public class PDFMerger {
 
 		try (PDDocument doc = PDDocument.load(mergedPDFStream)) {
 			// add image
-			File imageFile = new File(footerImage);
+			if (footerImage != null) {
+				File imageFile = new File(footerImage);
 
-			if (imageFile.exists() && imageFile.isFile()) {
-				for (PDPage page : doc.getPages()) {
-					PDImageXObject pdImage = PDImageXObject.createFromFile(footerImage, doc);
-					PDPageContentStream contentStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true);
+				if (imageFile.exists() && imageFile.isFile()) {
+					for (PDPage page : doc.getPages()) {
+						PDImageXObject pdImage = PDImageXObject.createFromFile(footerImage, doc);
+						PDPageContentStream contentStream = new PDPageContentStream(doc, page, AppendMode.APPEND, true);
 
-					// contentStream.drawImage(ximage, 20, 20 );
-					// better method inspired by
-					// http://stackoverflow.com/a/22318681/535646
-					// reduce this value if the image is too large
-					float scale = 1f;
-					contentStream.drawImage(pdImage, 0, 0, pdImage.getWidth() * scale, pdImage.getHeight() * scale);
+						float scale = 1f;
+						contentStream.drawImage(pdImage, 0, 0, pdImage.getWidth() * scale, pdImage.getHeight() * scale);
 
-					contentStream.close();
+						contentStream.close();
+					}
 				}
 			}
 
@@ -188,4 +187,5 @@ public class PDFMerger {
 			}
 		}
 	}
+
 }

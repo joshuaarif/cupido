@@ -46,7 +46,7 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 			String emailSubject, String emailBody) {
 		super();
 		this.rootWorksheetFolderPath = rootWorksheetFolderPath;
-		this.targetFilePath = targetFilePath;
+		setTargetFilePath(targetFilePath);
 		this.size = size;
 		this.emailTo = emailTo;
 		this.emailSubject = emailSubject;
@@ -85,6 +85,7 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 		LOG.info("Generate from " + size + " worksheets");
 		generator.generate(this.rootWorksheetFolderPath, this.targetFilePath, this.size, this.pdfTitle, this.pdfCreator,
 				this.pdfSubject, this.pdfFooterImagePath);
+		LOG.info("Generate from " + size + " worksheets done");
 		try {
 			LOG.info("Sending mail to " + emailTo);
 			MimeMessage email = gmailSender.createEmailWithAttachment(this.emailTo, GMAIL_USER, this.emailSubject,
@@ -117,6 +118,10 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 	}
 
 	public void setTargetFilePath(String targetFilePath) {
+		if (!targetFilePath.toLowerCase().endsWith(".pdf")) {
+			targetFilePath = targetFilePath.concat(".pdf");
+		}
+
 		this.targetFilePath = targetFilePath;
 	}
 
