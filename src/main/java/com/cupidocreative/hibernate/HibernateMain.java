@@ -25,6 +25,7 @@ public class HibernateMain {
 
 			for (int j = 0; j < 2; j++) {
 				PurchaseOrderDtl orderDtl = new PurchaseOrderDtl();
+				orderDtl.setPoHeader(order);
 
 				orderDtl.setWorkbookCode((i % 2 == 0 ? "ADDITION" : "SUBTRACTION"));
 				orderDtl.setWorkbookSize(1);
@@ -36,7 +37,9 @@ public class HibernateMain {
 		}
 
 		orders.forEach(o -> {
-			session.persist(o);
+			session.save(o);
+
+			o.getPoDetails().forEach(oDtl -> session.save(oDtl));
 		});
 
 		t.commit();

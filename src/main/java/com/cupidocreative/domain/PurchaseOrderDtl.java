@@ -27,10 +27,10 @@ public class PurchaseOrderDtl implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@Column(length = 100, nullable = false)
+	@Column(name = "workbook_code", length = 100, nullable = false)
 	private String workbookCode;
 
-	@Column(length = 4, nullable = false)
+	@Column(name = "workbook_size", length = 4, nullable = false)
 	private int workbookSize;
 
 	public PurchaseOrderHdr getPoHeader() {

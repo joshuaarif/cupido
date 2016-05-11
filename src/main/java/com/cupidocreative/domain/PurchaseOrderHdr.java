@@ -20,13 +20,13 @@ public class PurchaseOrderHdr implements Serializable {
 	private static final long serialVersionUID = 6106622432348004462L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	@Column(length = 60, nullable = false)
 	private String email;
 
-	@Column(length = 20, nullable = false, unique = true)
+	@Column(name = "po_number", length = 20, nullable = false, unique = true)
 	private String poNumber;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "poHeader")
