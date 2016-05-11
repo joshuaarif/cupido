@@ -15,7 +15,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.cupidocreative.domain.CCPurchaseOrder;
+import com.cupidocreative.domain.PurchaseOrderDtl;
+import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.google.common.collect.Sets;
 
 public class XlsxReader {
@@ -51,8 +52,8 @@ public class XlsxReader {
 		return workbook;
 	}
 
-	public Set<CCPurchaseOrder> readOrderFromExcel(String excelFilePath) {
-		Set<CCPurchaseOrder> result = Sets.newLinkedHashSet();
+	public Set<PurchaseOrderHdr> readOrderFromExcel(String excelFilePath) {
+		Set<PurchaseOrderHdr> result = Sets.newLinkedHashSet();
 
 		try (FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
 				Workbook workbook = getWorkbook(inputStream, excelFilePath)) {
@@ -65,7 +66,8 @@ public class XlsxReader {
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
-				CCPurchaseOrder order = new CCPurchaseOrder();
+				PurchaseOrderHdr orderHdr = new PurchaseOrderHdr();
+				PurchaseOrderDtl orderDtl = new PurchaseOrderDtl();
 
 				while (cellIterator.hasNext()) {
 					Cell nextCell = cellIterator.next();
@@ -73,23 +75,23 @@ public class XlsxReader {
 
 					switch (columnIndex) {
 					case 0:
-						order.setEmail((String) getCellValue(nextCell));
+						orderHdr.setEmail((String) getCellValue(nextCell));
 						break;
 					case 1:
-						order.setWorkbookCode((String) getCellValue(nextCell));
+						orderHdr.setWorkbookCode((String) getCellValue(nextCell));
 						break;
 					case 2:
 						Double cellValue = (double) getCellValue(nextCell);
 						int intCellValue = cellValue.intValue();
-						order.setWorkbookSize(intCellValue);
+						orderHdr.setWorkbookSize(intCellValue);
 						break;
 					case 3:
-						order.setPoNumber((String) getCellValue(nextCell));
+						orderHdr.setPoNumber((String) getCellValue(nextCell));
 						break;
 					}
 				}
 
-				result.add(order);
+				result.add(orderHdr);
 			}
 		} catch (IOException e) {
 			LOG.error("Error read order from excel : " + e.getMessage());

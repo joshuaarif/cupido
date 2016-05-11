@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cupidocreative.domain.CCPurchaseOrder;
+import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.cupidocreative.order.XlsxReader;
 import com.cupidocreative.util.StringTemplateUtil;
 import com.google.api.client.util.Maps;
@@ -26,7 +26,7 @@ public class PDFMergerMain {
 	public static void main(String[] args) {
 		// begin init
 		XlsxReader xlsxReader = new XlsxReader();
-		Set<CCPurchaseOrder> orders = xlsxReader
+		Set<PurchaseOrderHdr> orders = xlsxReader
 				.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education.com/po_list.xlsx");
 
 		// for (int i = 0; i < 20; i++) {
