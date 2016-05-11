@@ -82,4 +82,13 @@ public class CCPurchaseOrder {
 		this.workbookSize = workbookSize;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CCPurchaseOrder [email=").append(email).append(", poNumber=").append(poNumber)
+				.append(", workbookCode=").append(workbookCode).append(", workbookSize=").append(workbookSize)
+				.append("]");
+		return builder.toString();
+	}
+
 }

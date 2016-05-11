@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cupidocreative.domain.CCPurchaseOrder;
+import com.cupidocreative.order.XlsxReader;
 import com.cupidocreative.util.StringTemplateUtil;
 import com.google.api.client.util.Maps;
 import com.google.common.collect.Sets;
@@ -24,17 +25,22 @@ public class PDFMergerMain {
 
 	public static void main(String[] args) {
 		// begin init
-		Set<CCPurchaseOrder> orders = Sets.newLinkedHashSet();
+		XlsxReader xlsxReader = new XlsxReader();
+		Set<CCPurchaseOrder> orders = xlsxReader
+				.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education.com/po_list.xlsx");
 
-		for (int i = 0; i < 20; i++) {
-			CCPurchaseOrder order = new CCPurchaseOrder();
-			order.setEmail((i % 2 == 0 ? "timotius.pamungkas@gmail.com" : "timotius_pamungkas@yahoo.com"));
-			order.setPoNumber(Integer.toHexString(ThreadLocalRandom.current().nextInt(2000)).toUpperCase());
-			order.setWorkbookCode((i % 2 == 0 ? "ADDITION" : "SUBTRACTION"));
-			order.setWorkbookSize(1);
+		// for (int i = 0; i < 20; i++) {
+		// CCPurchaseOrder order = new CCPurchaseOrder();
+		// order.setEmail((i % 2 == 0 ? "timotius.pamungkas@gmail.com" :
+		// "timotius_pamungkas@yahoo.com"));
+		// order.setPoNumber(Integer.toHexString(ThreadLocalRandom.current().nextInt(2000)).toUpperCase());
+		// order.setWorkbookCode((i % 2 == 0 ? "ADDITION" : "SUBTRACTION"));
+		// order.setWorkbookSize(1);
+		//
+		// orders.add(order);
+		// }
 
-			orders.add(order);
-		}
+		orders.forEach(o -> LOG.info(o));
 
 		File tempDir = new File(TEMP_DIR);
 		if (!tempDir.exists()) {
@@ -42,7 +48,7 @@ public class PDFMergerMain {
 		}
 
 		ExecutorService executorService = Executors.newFixedThreadPool(3);
-		
+
 		// start create from order
 		orders.forEach(o -> {
 			String rootWorksheetFolderPath = o.getWorkbookCode().equals("ADDITION") ? ROOT_WORKSHEET_FOLDER_ADD
@@ -55,7 +61,7 @@ public class PDFMergerMain {
 
 			Map<String, String> values = Maps.newHashMap();
 			values.put("name", o.getEmail());
-			
+
 			try {
 				emailBody = StringTemplateUtil.createFromST("email_body.html", '$', values);
 			} catch (Exception e) {
@@ -66,10 +72,10 @@ public class PDFMergerMain {
 			PDFWorkbookGeneratorTask task = new PDFWorkbookGeneratorTask(rootWorksheetFolderPath, targetFilePath, size,
 					emailTo, emailSubject, emailBody);
 			task.setDeleteTempPdfFile(true);
-			
-			executorService.submit(task);
+
+			// executorService.submit(task);
 		});
-		
+
 		executorService.shutdown();
 	}
 
