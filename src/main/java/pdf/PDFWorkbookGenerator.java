@@ -65,7 +65,7 @@ public class PDFWorkbookGenerator {
 
 		// must be in different loop, because worksheet comes first before
 		// answer
-		LOG.info("Generating worksheet");
+		LOG.info("Generating workbook from " + worksheets.size() + " files");
 		for (File f : worksheets) {
 			try {
 				sources.add(FileUtils.openInputStream(f));
@@ -91,7 +91,7 @@ public class PDFWorkbookGenerator {
 		} catch (IOException e) {
 			LOG.error(e.getMessage());
 		}
-		LOG.info("Generating worksheet : Done");
+		LOG.info("Generating workbook : Done");
 	}
 
 	private static File getWorksheetAnswer(File worksheet) {
