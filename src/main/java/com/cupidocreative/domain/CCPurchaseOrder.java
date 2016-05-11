@@ -1,13 +1,30 @@
 package com.cupidocreative.domain;
 
-/**
- * Cupido Creative Purchase Order
- */
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "PURCHASE_ORDERS")
 public class CCPurchaseOrder {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
+
+	@Column(length = 60, nullable = false)
 	private String email;
+
+	@Column(length = 20, nullable = false, unique = true)
 	private String poNumber;
+
+	@Column(length = 100, nullable = false)
 	private String workbookCode;
+
+	@Column(length = 4, nullable = false)
 	private int workbookSize;
 
 	@Override
@@ -89,6 +106,14 @@ public class CCPurchaseOrder {
 				.append(", workbookCode=").append(workbookCode).append(", workbookSize=").append(workbookSize)
 				.append("]");
 		return builder.toString();
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 }

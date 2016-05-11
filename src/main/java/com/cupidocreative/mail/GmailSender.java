@@ -87,7 +87,7 @@ public class GmailSender {
 	 */
 	public static Credential authorize() throws IOException {
 		// Load client secrets.
-		InputStream in = GmailSender.class.getResourceAsStream("/client_secret_gmail.json");
+		InputStream in = GmailSender.class.getResourceAsStream("/mail/client_secret_gmail.json");
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
 		// Build flow and trigger user authorization request.
