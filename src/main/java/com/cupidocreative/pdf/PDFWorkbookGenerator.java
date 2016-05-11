@@ -18,18 +18,22 @@ public class PDFWorkbookGenerator {
 	private static final Log LOG = LogFactory.getLog(PDFWorkbookGenerator.class);
 
 	/**
-	 * 
 	 * @param rootWorksheetFolder
 	 *            Directory to worksheet, eg : .../Addition/worksheet
 	 * @param targetFile
 	 *            file to generated
 	 * @param size
 	 *            number of worksheet
+	 * @param title
+	 * @param creator
+	 * @param subject
+	 * @param footerImagePath
 	 */
-	public void generate(String rootWorksheetFolder, String targetFile, int size) {
+	public void generate(String rootWorksheetFolder, String targetFile, int size, String title, String creator,
+			String subject, String footerImagePath) {
 		File file = new File(rootWorksheetFolder);
 		File target = new File(targetFile);
-		PDFMerger pdfMerger = new PDFMerger();
+		PDFMerger pdfMerger = new PDFMerger(title, creator, subject, footerImagePath);
 
 		// original file
 		List<File> worksheetFiles = Lists.newArrayList(file.listFiles());
@@ -70,8 +74,7 @@ public class PDFWorkbookGenerator {
 			try {
 				sources.add(FileUtils.openInputStream(f));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getMessage());
 			}
 		}
 
@@ -81,8 +84,7 @@ public class PDFWorkbookGenerator {
 					sources.add(FileUtils.openInputStream(f));
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error(e.getMessage());
 			}
 		}
 

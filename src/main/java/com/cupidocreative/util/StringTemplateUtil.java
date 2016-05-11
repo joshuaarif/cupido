@@ -29,7 +29,7 @@ public class StringTemplateUtil {
 	 * @throws IOException
 	 *             if template can't be found
 	 */
-	public String createFromST(String templatePath, char delimiter, Map<String, String> values)
+	public static String createFromST(String templatePath, char delimiter, Map<String, String> values)
 			throws IOException {
 		InputStream templateStream = PDFMergerMain.class.getClassLoader().getResourceAsStream(templatePath);
 

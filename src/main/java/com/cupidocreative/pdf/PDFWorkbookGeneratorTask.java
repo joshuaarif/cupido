@@ -19,10 +19,12 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 	private String emailTo;
 	private Log LOG = LogFactory.getLog(PDFWorkbookGeneratorTask.class);
 	private String rootWorksheetFolderPath;
-
 	private int size;
-
 	private String targetFilePath;
+	private String pdfTitle = "Cupido Creative";
+	private String pdfCreator = "www.cupidocreative.com";
+	private String pdfSubject = "Buku Latihan Cupido Creative, lihat lengkapnya di www.cupidocreative.com";
+	private String pdfFooterImagePath;
 
 	/**
 	 * Generate workbook and send mail as attachment
@@ -81,7 +83,8 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 		GmailSender gmailSender = new GmailSender();
 
 		LOG.info("Generate from " + size + " worksheets");
-		generator.generate(this.rootWorksheetFolderPath, this.targetFilePath, this.size);
+		generator.generate(this.rootWorksheetFolderPath, this.targetFilePath, this.size, this.pdfTitle, this.pdfCreator,
+				this.pdfSubject, this.pdfFooterImagePath);
 		try {
 			LOG.info("Sending mail to " + emailTo);
 			MimeMessage email = gmailSender.createEmailWithAttachment(this.emailTo, GMAIL_USER, this.emailSubject,
@@ -115,6 +118,38 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 
 	public void setTargetFilePath(String targetFilePath) {
 		this.targetFilePath = targetFilePath;
+	}
+
+	public String getPdfTitle() {
+		return pdfTitle;
+	}
+
+	public void setPdfTitle(String pdfTitle) {
+		this.pdfTitle = pdfTitle;
+	}
+
+	public String getPdfCreator() {
+		return pdfCreator;
+	}
+
+	public void setPdfCreator(String pdfCreator) {
+		this.pdfCreator = pdfCreator;
+	}
+
+	public String getPdfSubject() {
+		return pdfSubject;
+	}
+
+	public void setPdfSubject(String pdfSubject) {
+		this.pdfSubject = pdfSubject;
+	}
+
+	public String getPdfFooterImagePath() {
+		return pdfFooterImagePath;
+	}
+
+	public void setPdfFooterImagePath(String pdfFooterImagePath) {
+		this.pdfFooterImagePath = pdfFooterImagePath;
 	}
 
 }

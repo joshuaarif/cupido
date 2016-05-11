@@ -40,19 +40,12 @@ public class PDFMerger {
 	private String title;
 	private String footerImage;
 
-	public PDFMerger() {
-		this.title = "Cupido Creative worksheet";
-		this.creator = "www.cupidocreative.com";
-		this.subject = "Cupido Creative worksheet";
-		this.footerImage = "D:/Personal/Cupido/Education.com/Worksheet/Generator/Addition/footer.jpg";
-	}
-
-	public PDFMerger(String title, String creator, String subject, String footerImage) {
+	public PDFMerger(String title, String creator, String subject, String footerImagePath) {
 		super();
 		this.title = title;
 		this.creator = creator;
 		this.subject = subject;
-		this.footerImage = footerImage;
+		this.footerImage = footerImagePath;
 	}
 
 	private PDDocumentInformation createPDFDocumentInfo(String title, String creator, String subject,
