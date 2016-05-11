@@ -15,7 +15,21 @@ import pdf.PDFMergerMain;
 
 public class EmailUtil {
 
-	public String createEmailBody(String templatePath, char delimiter, Map<String, String> emailValues)
+	/**
+	 * Create email body using StringTemplate
+	 * 
+	 * @param templatePath
+	 *            path, relative to ClassLoader
+	 * @param delimiter
+	 *            delimiter for bound param
+	 * @param emailValues
+	 *            map contains values for bound param. Map key = param on
+	 *            template, Map value = replacement value for bound param
+	 * @return string with bound param replaced
+	 * @throws IOException
+	 *             if template can't be found
+	 */
+	public String createFromStringTemplate(String templatePath, char delimiter, Map<String, String> emailValues)
 			throws IOException {
 		InputStream templateStream = PDFMergerMain.class.getClassLoader().getResourceAsStream(templatePath);
 
