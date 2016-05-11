@@ -28,7 +28,7 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 	private String pdfCreator = "www.cupidocreative.com";
 	private String pdfSubject = "Buku Latihan Cupido Creative, lihat lengkapnya di www.cupidocreative.com";
 	private String pdfFooterImagePath;
-	private boolean deleteAfterProcess = false;
+	private boolean deleteTempPdfFile = false;
 
 	/**
 	 * Generate workbook and send mail as attachment
@@ -97,8 +97,8 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 		return targetFilePath;
 	}
 
-	public boolean isDeleteAfterProcess() {
-		return deleteAfterProcess;
+	public boolean isDeleteTempPdfFile() {
+		return deleteTempPdfFile;
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 			gmailSender.sendMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 			LOG.info("Mail sent to " + emailTo);
 
-			if (deleteAfterProcess) {
+			if (deleteTempPdfFile) {
 				Files.deleteIfExists(FileSystems.getDefault().getPath(targetFilePath));
 			}
 		} catch (MessagingException | IOException e) {
@@ -125,8 +125,8 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 		}
 	}
 
-	public void setDeleteAfterProcess(boolean deleteAfterProcess) {
-		this.deleteAfterProcess = deleteAfterProcess;
+	public void setDeleteTempPdfFile(boolean deleteTempPdfFile) {
+		this.deleteTempPdfFile = deleteTempPdfFile;
 	}
 
 	public void setEmailBody(String emailBody) {
