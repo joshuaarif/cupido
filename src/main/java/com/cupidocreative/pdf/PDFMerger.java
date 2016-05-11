@@ -1,6 +1,5 @@
 package com.cupidocreative.pdf;
 
-import java.awt.image.ImageFilter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
