@@ -118,7 +118,7 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 			attachments.add(new File(targetFilePath));
 
 			LOG.info("Sending mail to : " + emailTo + ", subject : " + this.emailSubject);
-			MimeMessage email = mailUtil.createEmailWithAttachments(this.emailTo, GMAIL_USER, this.emailSubject,
+			MimeMessage email = mailUtil.createEmailWithAttachment(this.emailTo, GMAIL_USER, this.emailSubject,
 					this.emailBody, attachments);
 			gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 			LOG.info("Mail sent to " + emailTo);

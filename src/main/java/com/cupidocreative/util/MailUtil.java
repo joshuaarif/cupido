@@ -47,7 +47,34 @@ public class MailUtil {
 		return email;
 	}
 
-	public MimeMessage createEmailWithAttachments(String to, String from, String subject, String bodyText,
+	public MimeMessage createEmailWithAttachment(String to, String from, String subject, String bodyText,
+			File attachment) throws MessagingException, IOException {
+		Properties props = new Properties();
+		Session session = Session.getDefaultInstance(props, null);
+
+		MimeMessage email = new MimeMessage(session);
+		InternetAddress tAddress = new InternetAddress(to);
+		InternetAddress fAddress = new InternetAddress(from);
+
+		email.setFrom(fAddress);
+		email.addRecipient(javax.mail.Message.RecipientType.TO, tAddress);
+		email.setSubject(subject);
+
+		MimeBodyPart mimeBodyPart = new MimeBodyPart();
+		mimeBodyPart.setContent(bodyText, "text/html");
+		mimeBodyPart.setHeader("Content-Type", "text/html; charset=\"UTF-8\"");
+
+		Multipart multipart = new MimeMultipart();
+
+		mimeBodyPart = new MimeBodyPart();
+		attachFile(attachment, multipart, mimeBodyPart);
+
+		email.setContent(multipart);
+
+		return email;
+	}
+
+	public MimeMessage createEmailWithAttachment(String to, String from, String subject, String bodyText,
 			Collection<File> attachment) throws MessagingException, IOException {
 		Properties props = new Properties();
 		Session session = Session.getDefaultInstance(props, null);

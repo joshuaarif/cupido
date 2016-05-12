@@ -3,6 +3,7 @@ package com.cupidocreative.order;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Set;
@@ -37,6 +38,11 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 
 	private static final long serialVersionUID = 1892887526478255535L;
 	private static final String GMAIL_USER = "me";
+
+	/**
+	 * MAx attachment size in one gmail, 15 MB
+	 */
+	private static final long MAX_ATTACHMENT_SIZE = 15728640;
 
 	private PurchaseOrderHdr poHeader;
 	private PDFWorkbookGenerator pdfGenerator;
@@ -77,13 +83,37 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 
 		// send mail for each order (multiple attachments)
 		try {
-			LOG.info("Sending mail to : " + poHeader.getEmail() + ", subject : " + poHeader.getPoNumber());
-			MimeMessage email = mailUtil.createEmailWithAttachments(poHeader.getEmail(), GMAIL_USER,
-					"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody", tempFiles);
-			gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
-			LOG.info("Mail sent to " + poHeader.getEmail());
+			long totalSize = 0;
+			MimeMessage email;
 
-			// Files.deleteIfExists(FileSystems.getDefault().getPath(targetFile));
+			for (File f : tempFiles) {
+				totalSize += f.getTotalSpace();
+			}
+
+			if (totalSize < MAX_ATTACHMENT_SIZE) {
+				LOG.info("Sending single mail to : " + poHeader.getEmail() + ", subject : " + poHeader.getPoNumber());
+				email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
+						"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
+						tempFiles);
+				gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+
+				for (File attachment : tempFiles) {
+					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
+				}
+			} else {
+				LOG.info(
+						"Sending multiple mails to : " + poHeader.getEmail() + ", subject : " + poHeader.getPoNumber());
+
+				for (File attachment : tempFiles) {
+					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
+							"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
+							attachment);
+					gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+
+					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
+				}
+			}
+			LOG.info("Mail sent to " + poHeader.getEmail());
 		} catch (MessagingException | IOException e) {
 			LOG.error("Send mail to " + poHeader.getEmail() + " failed : " + e.getMessage());
 		}
