@@ -1,6 +1,7 @@
 package com.cupidocreative.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -22,6 +23,7 @@ public class PurchaseOrderHdr implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "po_hdr_id", nullable = false, unique = true)
 	private long id;
 
 	@Column(length = 60, nullable = false)
@@ -36,6 +38,32 @@ public class PurchaseOrderHdr implements Serializable {
 	 */
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "poHeader")
 	private List<PurchaseOrderDtl> poDetails = Lists.newArrayListWithCapacity(5);
+
+	@Column(name = "creation_date", nullable = false)
+	private Date creationDate;
+
+	@Column(name = "last_update_date", nullable = false)
+	private Date lastUpdateDate;
+
+	@Column(name = "created_by")
+	private int createdBy;
+
+	@Column(name = "last_updated_by")
+	private int lastUpdatedBy;
+
+	/**
+	 * Payment status, apakah sudah diterima atau belum. Urutannya : NEW > PAID,
+	 * atau NEW > CANCEL
+	 */
+	@Column(name = "payment_status", length = 15)
+	private String payment_status;
+
+	/**
+	 * Process status, apakah sudah digenerate / sent. Urutannya : NEW >
+	 * GENERATED > COMPLETE atau NEW > CANCEL
+	 */
+	@Column(name = "process_status", length = 15)
+	private String processStatus;
 
 	public void addOrderDetail(PurchaseOrderDtl orderDtl) {
 		getPoDetails().add(orderDtl);
@@ -104,5 +132,53 @@ public class PurchaseOrderHdr implements Serializable {
 		builder.append("PurchaseOrderHdr [id=").append(id).append(", email=").append(email).append(", poNumber=")
 				.append(poNumber).append(", poDetails=").append(poDetails).append("]");
 		return builder.toString();
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getLastUpdateDate() {
+		return lastUpdateDate;
+	}
+
+	public void setLastUpdateDate(Date lastUpdateDate) {
+		this.lastUpdateDate = lastUpdateDate;
+	}
+
+	public int getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(int createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public int getLastUpdatedBy() {
+		return lastUpdatedBy;
+	}
+
+	public void setLastUpdatedBy(int lastUpdatedBy) {
+		this.lastUpdatedBy = lastUpdatedBy;
+	}
+
+	public String getPayment_status() {
+		return payment_status;
+	}
+
+	public void setPayment_status(String payment_status) {
+		this.payment_status = payment_status;
+	}
+
+	public String getProcessStatus() {
+		return processStatus;
+	}
+
+	public void setProcessStatus(String processStatus) {
+		this.processStatus = processStatus;
 	}
 }

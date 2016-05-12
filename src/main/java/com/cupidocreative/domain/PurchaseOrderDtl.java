@@ -1,6 +1,7 @@
 package com.cupidocreative.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +33,18 @@ public class PurchaseOrderDtl implements Serializable {
 
 	@Column(name = "workbook_size", length = 4, nullable = false)
 	private int workbookSize;
+
+	@Column(name = "creation_date", nullable = false)
+	private Date creationDate;
+
+	@Column(name = "last_update_date", nullable = false)
+	private Date lastUpdateDate;
+
+	@Column(name = "created_by")
+	private int createdBy;
+
+	@Column(name = "last_updated_by")
+	private int lastUpdatedBy;
 
 	public PurchaseOrderHdr getPoHeader() {
 		return poHeader;
@@ -100,6 +113,38 @@ public class PurchaseOrderDtl implements Serializable {
 				.append(", workbookCode=").append(workbookCode).append(", workbookSize=").append(workbookSize)
 				.append("]");
 		return builder.toString();
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getLastUpdateDate() {
+		return lastUpdateDate;
+	}
+
+	public void setLastUpdateDate(Date lastUpdateDate) {
+		this.lastUpdateDate = lastUpdateDate;
+	}
+
+	public int getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(int createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public int getLastUpdatedBy() {
+		return lastUpdatedBy;
+	}
+
+	public void setLastUpdatedBy(int lastUpdatedBy) {
+		this.lastUpdatedBy = lastUpdatedBy;
 	}
 
 }

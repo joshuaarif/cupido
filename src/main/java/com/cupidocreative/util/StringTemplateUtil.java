@@ -11,7 +11,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.compiler.CompiledST;
 
-import com.cupidocreative.pdf.PDFMergerMain;
+import com.cupidocreative.main.PDFMergerMain;
 
 public class StringTemplateUtil {
 

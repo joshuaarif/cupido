@@ -1,17 +1,19 @@
-package com.cupidocreative.hibernate;
+package com.cupidocreative.main;
 
+import java.util.Calendar;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.cupidocreative.common.PaymentStatus;
+import com.cupidocreative.common.ProcessStatus;
 import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
+import com.cupidocreative.hibernate.HibernateUtil;
 import com.cupidocreative.order.XlsxReader;
-import com.google.common.collect.Sets;
 
-public class HibernateMain {
+public class HibernateInjectorMain {
 
 	public static void main(String[] args) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
@@ -40,15 +42,29 @@ public class HibernateMain {
 
 		XlsxReader xlsxReader = new XlsxReader();
 		Set<PurchaseOrderHdr> orders = xlsxReader
-				.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education.com/po_list.xlsx");
+				.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education/po_list.xlsx");
 
 		for (PurchaseOrderHdr o : orders) {
+			o.setCreationDate(Calendar.getInstance().getTime());
+			o.setLastUpdateDate(Calendar.getInstance().getTime());
+			o.setPayment_status(PaymentStatus.PAID.getValue());
+			o.setProcessStatus(ProcessStatus.NEW.getValue());
 			session.save(o);
 
 			for (PurchaseOrderDtl oDtl : o.getPoDetails()) {
+				oDtl.setCreationDate(Calendar.getInstance().getTime());
+				oDtl.setLastUpdateDate(Calendar.getInstance().getTime());
 				session.save(oDtl);
 			}
 		}
+
+		// List<PurchaseOrderHdr> list = (List<PurchaseOrderHdr>)
+		// session.createQuery("from PurchaseOrderHdr").list();
+		// System.out.println(list.size());
+		//
+		// for (PurchaseOrderHdr o : list) {
+		// System.out.println(o);
+		// }
 
 		t.commit();
 		session.close();

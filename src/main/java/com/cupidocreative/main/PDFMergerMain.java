@@ -1,4 +1,4 @@
-package com.cupidocreative.pdf;
+package com.cupidocreative.main;
 
 import java.io.File;
 import java.util.Set;
@@ -15,15 +15,15 @@ import com.cupidocreative.order.XlsxReader;
 public class PDFMergerMain {
 	private static final Log LOG = LogFactory.getLog(PDFMergerMain.class);
 
-	private static final String ROOT_WORKSHEET_FOLDER_ADD = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Addition/1-10/worksheet";
-	private static final String ROOT_WORKSHEET_FOLDER_SUB = "D:/Personal/Dropbox/Cupido/Education.com/Worksheet/Generator/Subtraction/1-20/worksheet";
+	private static final String ROOT_WORKSHEET_FOLDER_ADD = "D:/Personal/Dropbox/Cupido/Education/Worksheet/Generator/Addition/1-10/worksheet";
+	private static final String ROOT_WORKSHEET_FOLDER_SUB = "D:/Personal/Dropbox/Cupido/Education/Worksheet/Generator/Subtraction/1-20/worksheet";
 	private static final String TEMP_DIR = "D:/Personal/Cupido/PO";
 
 	public static void main(String[] args) {
 		// begin init
 		XlsxReader xlsxReader = new XlsxReader();
 		Set<PurchaseOrderHdr> orders = xlsxReader
-				.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education.com/po_list.xlsx");
+				.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education/po_list.xlsx");
 
 		// Set<PurchaseOrderHdr> orders = Sets.newLinkedHashSet();
 		//
