@@ -46,6 +46,9 @@ public class PurchaseOrderDtl implements Serializable {
 	@Column(name = "last_updated_by")
 	private int lastUpdatedBy;
 
+	@Column(name = "pdf_filename", length = 25)
+	private String pdfFilename;
+
 	public PurchaseOrderHdr getPoHeader() {
 		return poHeader;
 	}
@@ -145,6 +148,14 @@ public class PurchaseOrderDtl implements Serializable {
 
 	public void setLastUpdatedBy(int lastUpdatedBy) {
 		this.lastUpdatedBy = lastUpdatedBy;
+	}
+
+	public String getPdfFilename() {
+		return pdfFilename;
+	}
+
+	public void setPdfFilename(String pdfFilename) {
+		this.pdfFilename = pdfFilename;
 	}
 
 }
