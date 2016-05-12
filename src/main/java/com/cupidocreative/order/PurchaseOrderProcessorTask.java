@@ -40,7 +40,7 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 	private static final String GMAIL_USER = "me";
 
 	/**
-	 * MAx attachment size in one gmail, 15 MB
+	 * Max attachment size in one gmail, 15 MB
 	 */
 	private static final long MAX_ATTACHMENT_SIZE = 15728640;
 
@@ -81,17 +81,17 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 			pdfGenerator.generate(rootWorksheetFolderPath, targetFile, size, PDF_TITLE, PDF_CREATOR, PDF_SUBJECT, null);
 		}
 
-		// send mail for each order (multiple attachments)
+		// send mail for each order (single/multiple attachments based on total attachment size)
 		try {
 			long totalSize = 0;
 			MimeMessage email;
 
 			for (File f : tempFiles) {
-				totalSize += f.getTotalSpace();
+				totalSize += f.length();
 			}
 
 			if (totalSize < MAX_ATTACHMENT_SIZE) {
-				LOG.info("Sending single mail to : " + poHeader.getEmail() + ", subject : " + poHeader.getPoNumber());
+				LOG.info("Sending single mail to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 				email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
 						"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
 						tempFiles);
@@ -102,7 +102,7 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 				}
 			} else {
 				LOG.info(
-						"Sending multiple mails to : " + poHeader.getEmail() + ", subject : " + poHeader.getPoNumber());
+						"Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 
 				for (File attachment : tempFiles) {
 					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,

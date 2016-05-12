@@ -55,7 +55,7 @@ public class XlsxReader {
 	}
 
 	public Set<PurchaseOrderHdr> readOrderFromExcel(String excelFilePath) {
-		Map<String, PurchaseOrderHdr> mapOrders = Maps.newHashMap();
+		Map<String, PurchaseOrderHdr> mapOrders = Maps.newLinkedHashMap();
 
 		try (FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
 				Workbook workbook = getWorkbook(inputStream, excelFilePath)) {
@@ -78,7 +78,13 @@ public class XlsxReader {
 					switch (columnIndex) {
 					// first column must be PO number
 					case 0:
-						String poNumber = (String) getCellValue(nextCell);
+						// handle if numeric
+						String poNumber;
+						try {
+							poNumber = (String) getCellValue(nextCell);
+						} catch (ClassCastException e) {
+							poNumber = Long.toString(Math.round((double) getCellValue(nextCell)));
+						}
 
 						if (mapOrders.containsKey(poNumber)) {
 							order = mapOrders.get(poNumber);
