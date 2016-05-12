@@ -3,9 +3,9 @@ package com.cupidocreative.order;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,18 +13,22 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.logging.LogFactory;
-
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+import com.cupidocreative.common.ProcessStatus;
+import com.cupidocreative.common.TaskStatus;
 import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
+import com.cupidocreative.hibernate.HibernateUtil;
 import com.cupidocreative.mail.GmailSender;
 import com.cupidocreative.pdf.PDFWorkbookGenerator;
 import com.cupidocreative.util.MailUtil;
 import com.google.common.collect.Sets;
 
-public class PurchaseOrderProcessorTask implements Callable<String>, Serializable {
+public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Serializable {
 
 	private static final Log LOG = LogFactory.getLog(PurchaseOrderProcessorTask.class);
 
@@ -57,32 +61,47 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 		super();
 		this.poHeader = poHeader;
 		this.pdfGenerator = new PDFWorkbookGenerator();
-		// somehow ini harus ada kalau fetch type PoHeader nya LAZY, kaya ga dikenalin
+		// somehow ini harus ada kalau fetch type PoHeader nya LAZY, kaya ga
+		// dikenalin
 		// gitu fetch nya, harus EAGER kalau ga ada ini
 		LOG.debug(poHeader.getPoDetails());
 	}
 
 	@Override
-	public String call() throws Exception {
+	public TaskStatus call() throws Exception {
 		final MailUtil mailUtil = new MailUtil();
 		final GmailSender gmailSender = new GmailSender();
 		String rootWorksheetFolderPath;
 		String targetFile;
 		int size;
 		Set<File> tempFiles = Sets.newLinkedHashSetWithExpectedSize(poHeader.getPoDetails().size());
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction t = session.beginTransaction();
 
 		// generate for each order detail
 		for (PurchaseOrderDtl orderDtl : poHeader.getPoDetails()) {
 			rootWorksheetFolderPath = orderDtl.getWorkbookCode().equals("ADDITION") ? ROOT_WORKSHEET_FOLDER_ADD
 					: ROOT_WORKSHEET_FOLDER_SUB;
-			targetFile = new StringBuilder(TEMP_DIR.getPath()).append(File.separatorChar).append(poHeader.getPoNumber())
-					.append("_").append(ThreadLocalRandom.current().nextInt()).append(".pdf").toString();
+			String pdfFilename = new StringBuilder().append(poHeader.getPoNumber()).append("_")
+					.append(ThreadLocalRandom.current().nextInt(1000, 9999)).append(".pdf").toString();
+			targetFile = new StringBuilder(TEMP_DIR.getPath()).append(File.separatorChar).append(pdfFilename)
+					.toString();
 
 			size = orderDtl.getWorkbookSize();
 			tempFiles.add(new File(targetFile));
 
 			pdfGenerator.generate(rootWorksheetFolderPath, targetFile, size, PDF_TITLE, PDF_CREATOR, PDF_SUBJECT, null);
+
+			orderDtl.setLastUpdateDate(Calendar.getInstance().getTime());
+			orderDtl.setPdfFilename(pdfFilename);
+			session.update(orderDtl);
 		}
+
+		poHeader.setProcessStatus(ProcessStatus.GENERATED.getValue());
+		session.update(poHeader);
+
+		t.commit();
+		session.flush();
 
 		// send mail for each order (single/multiple attachments based on total
 		// attachment size)
@@ -116,11 +135,20 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
 				}
 			}
+			poHeader.setProcessStatus(ProcessStatus.COMPLETE.getValue());
+			session.update(poHeader);
+
+			session.flush();
+
 			LOG.info("Mail sent to " + poHeader.getEmail());
 		} catch (MessagingException | IOException e) {
 			LOG.error("Send mail to " + poHeader.getEmail() + " failed : " + e.getMessage());
+			return TaskStatus.FAILED;
+		} finally {
+			session.close();
 		}
-		return null;
+
+		return TaskStatus.SUCCESS;
 	}
 
 }
