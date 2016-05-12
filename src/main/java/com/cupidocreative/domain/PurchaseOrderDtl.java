@@ -65,4 +65,41 @@ public class PurchaseOrderDtl implements Serializable {
 		this.workbookSize = workbookSize;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 29;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((poHeader == null) ? 0 : poHeader.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PurchaseOrderDtl other = (PurchaseOrderDtl) obj;
+		if (id != other.id)
+			return false;
+		if (poHeader == null) {
+			if (other.poHeader != null)
+				return false;
+		} else if (!poHeader.equals(other.poHeader))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PurchaseOrderDtl [poHeader=").append(poHeader.getPoNumber()).append(", id=").append(id)
+				.append(", workbookCode=").append(workbookCode).append(", workbookSize=").append(workbookSize)
+				.append("]");
+		return builder.toString();
+	}
+
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +16,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
+import com.google.api.client.util.Maps;
 import com.google.common.collect.Sets;
 
 public class XlsxReader {
@@ -52,7 +55,7 @@ public class XlsxReader {
 	}
 
 	public Set<PurchaseOrderHdr> readOrderFromExcel(String excelFilePath) {
-		Set<PurchaseOrderHdr> result = Sets.newLinkedHashSet();
+		Map<String, PurchaseOrderHdr> mapOrders = Maps.newHashMap();
 
 		try (FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
 				Workbook workbook = getWorkbook(inputStream, excelFilePath)) {
@@ -65,37 +68,50 @@ public class XlsxReader {
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
-				PurchaseOrderHdr order = new PurchaseOrderHdr();
+				PurchaseOrderHdr order = null;
+				PurchaseOrderDtl orderDtl = new PurchaseOrderDtl();
 
 				while (cellIterator.hasNext()) {
 					Cell nextCell = cellIterator.next();
 					int columnIndex = nextCell.getColumnIndex();
 
 					switch (columnIndex) {
+					// first column must be PO number
 					case 0:
-						order.setEmail((String) getCellValue(nextCell));
+						String poNumber = (String) getCellValue(nextCell);
+
+						if (mapOrders.containsKey(poNumber)) {
+							order = mapOrders.get(poNumber);
+						} else {
+							order = new PurchaseOrderHdr();
+							order.setPoNumber(poNumber);
+							mapOrders.put(poNumber, order);
+						}
+						orderDtl.setPoHeader(order);
 						break;
 					case 1:
-						order.setWorkbookCode((String) getCellValue(nextCell));
+						if (order != null) {
+							order.setEmail((String) getCellValue(nextCell));
+						}
 						break;
 					case 2:
-						Double cellValue = (double) getCellValue(nextCell);
-						int intCellValue = cellValue.intValue();
-						order.setWorkbookSize(intCellValue);
+						orderDtl.setWorkbookCode((String) getCellValue(nextCell));
 						break;
 					case 3:
-						order.setPoNumber((String) getCellValue(nextCell));
+						Double cellValue = (double) getCellValue(nextCell);
+						int intCellValue = cellValue.intValue();
+						orderDtl.setWorkbookSize(intCellValue);
 						break;
 					}
 				}
-
-				result.add(order);
+				order.addOrderDetail(orderDtl);
+				System.out.println(order);
 			}
 		} catch (IOException e) {
 			LOG.error("Error read order from excel : " + e.getMessage());
 		}
 
-		return result;
+		return Sets.newLinkedHashSet(mapOrders.values());
 	}
 
 }
