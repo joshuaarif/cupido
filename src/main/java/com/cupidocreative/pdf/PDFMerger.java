@@ -35,6 +35,7 @@ import org.apache.xmpbox.xml.XmpSerializer;
 
 public class PDFMerger {
 	private static final Log LOG = LogFactory.getLog(PDFMerger.class);
+	private static final String PDF_ADMIN_PASSWORD = "12345678Aa";
 	private String creator;
 	private String footerImage;
 	private String subject;
@@ -135,7 +136,7 @@ public class PDFMerger {
 				accessPermission.setReadOnly();
 			}
 
-			StandardProtectionPolicy spp = new StandardProtectionPolicy("12345", "", accessPermission);
+			StandardProtectionPolicy spp = new StandardProtectionPolicy(PDF_ADMIN_PASSWORD, "", accessPermission);
 			spp.setEncryptionKeyLength(keyLength);
 			spp.setPermissions(accessPermission);
 			doc.protect(spp);
