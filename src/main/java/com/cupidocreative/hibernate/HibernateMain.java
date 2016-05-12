@@ -17,34 +17,38 @@ public class HibernateMain {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 
-//		Set<PurchaseOrderHdr> orders = Sets.newLinkedHashSet();
-//
-//		for (int i = 0; i < 20; i++) {
-//			PurchaseOrderHdr order = new PurchaseOrderHdr();
-//			order.setEmail((i % 2 == 0 ? "timotius.pamungkas@gmail.com" : "timotius_pamungkas@yahoo.com"));
-//			order.setPoNumber(Integer.toHexString(ThreadLocalRandom.current().nextInt(2000)).toUpperCase());
-//
-//			for (int j = 0; j < 2; j++) {
-//				PurchaseOrderDtl orderDtl = new PurchaseOrderDtl();
-//				orderDtl.setPoHeader(order);
-//
-//				orderDtl.setWorkbookCode((i % 2 == 0 ? "ADDITION" : "SUBTRACTION"));
-//				orderDtl.setWorkbookSize(1);
-//
-//				order.getPoDetails().add(orderDtl);
-//			}
-//
-//			orders.add(order);
-//		}
+		// Set<PurchaseOrderHdr> orders = Sets.newLinkedHashSet();
+		//
+		// for (int i = 0; i < 20; i++) {
+		// PurchaseOrderHdr order = new PurchaseOrderHdr();
+		// order.setEmail((i % 2 == 0 ? "timotius.pamungkas@gmail.com" :
+		// "timotius_pamungkas@yahoo.com"));
+		// order.setPoNumber(Integer.toHexString(ThreadLocalRandom.current().nextInt(2000)).toUpperCase());
+		//
+		// for (int j = 0; j < 2; j++) {
+		// PurchaseOrderDtl orderDtl = new PurchaseOrderDtl();
+		// orderDtl.setPoHeader(order);
+		//
+		// orderDtl.setWorkbookCode((i % 2 == 0 ? "ADDITION" : "SUBTRACTION"));
+		// orderDtl.setWorkbookSize(1);
+		//
+		// order.getPoDetails().add(orderDtl);
+		// }
+		//
+		// orders.add(order);
+		// }
 
 		XlsxReader xlsxReader = new XlsxReader();
-		Set<PurchaseOrderHdr> orders = xlsxReader.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education.com/po_list.xlsx");
-		
-		orders.forEach(o -> {
+		Set<PurchaseOrderHdr> orders = xlsxReader
+				.readOrderFromExcel("D:/Personal/Dropbox/Cupido/Education.com/po_list.xlsx");
+
+		for (PurchaseOrderHdr o : orders) {
 			session.save(o);
 
-			o.getPoDetails().forEach(oDtl -> session.save(oDtl));
-		});
+			for (PurchaseOrderDtl oDtl : o.getPoDetails()) {
+				session.save(oDtl);
+			}
+		}
 
 		t.commit();
 		session.close();

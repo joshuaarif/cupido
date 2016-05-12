@@ -2,9 +2,9 @@ package com.cupidocreative.pdf;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -13,6 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.cupidocreative.mail.GmailSender;
+import com.cupidocreative.util.MailUtil;
+import com.google.api.client.util.Lists;
 
 public class PDFWorkbookGeneratorTask implements Runnable {
 
@@ -105,16 +107,20 @@ public class PDFWorkbookGeneratorTask implements Runnable {
 	public void run() {
 		PDFWorkbookGenerator generator = new PDFWorkbookGenerator();
 		GmailSender gmailSender = new GmailSender();
+		MailUtil mailUtil = new MailUtil();
 
 		LOG.info("Generate from " + size + " worksheets");
 		generator.generate(this.rootWorksheetFolderPath, this.targetFilePath, this.size, this.pdfTitle, this.pdfCreator,
 				this.pdfSubject, this.pdfFooterImagePath);
 		LOG.info("Generate from " + size + " worksheets done");
 		try {
+			List<File> attachments = Lists.newArrayList();
+			attachments.add(new File(targetFilePath));
+
 			LOG.info("Sending mail to : " + emailTo + ", subject : " + this.emailSubject);
-			MimeMessage email = gmailSender.createEmailWithAttachment(this.emailTo, GMAIL_USER, this.emailSubject,
-					this.emailBody, new File(targetFilePath));
-			gmailSender.sendMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+			MimeMessage email = mailUtil.createEmailWithAttachments(this.emailTo, GMAIL_USER, this.emailSubject,
+					this.emailBody, attachments);
+			gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 			LOG.info("Mail sent to " + emailTo);
 
 			if (deleteTempPdfFile) {

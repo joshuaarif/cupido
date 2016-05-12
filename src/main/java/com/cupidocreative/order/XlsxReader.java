@@ -105,7 +105,6 @@ public class XlsxReader {
 					}
 				}
 				order.addOrderDetail(orderDtl);
-				System.out.println(order);
 			}
 		} catch (IOException e) {
 			LOG.error("Error read order from excel : " + e.getMessage());

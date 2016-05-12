@@ -6,7 +6,7 @@
 	<version>1.0.0-BETA</version>
 
 	<properties>
-		<java.sdk.version>1.8</java.sdk.version>
+		<java.sdk.version>1.7</java.sdk.version>
 		<apache.poi.version>3.14</apache.poi.version>
 		<apache.pdfbox.version>2.0.1</apache.pdfbox.version>
 		<commons.io.version>2.5</commons.io.version>
@@ -22,6 +22,7 @@
 		<mysql-connector-java-version>5.1.38</mysql-connector-java-version>
 		<org.hibernate.core.version>5.1.0.Final</org.hibernate.core.version>
 		<org.hibernate.annotations.version>3.5.6-Final</org.hibernate.annotations.version>
+		<commons.lang3.version>3.4</commons.lang3.version>
 	</properties>
 
 	<build>
@@ -161,6 +162,12 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
 			<version>${org.hibernate.annotations.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons.lang3.version}</version>
 		</dependency>
 
 		<dependency>
