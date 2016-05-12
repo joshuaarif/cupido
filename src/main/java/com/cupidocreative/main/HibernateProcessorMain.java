@@ -38,14 +38,11 @@ public class HibernateProcessorMain {
 		for (PurchaseOrderHdr o : orders) {
 			LOG.info("Processing : " + o.getPoNumber());
 			PurchaseOrderProcessorTask task = new PurchaseOrderProcessorTask(o);
-			task.sessionHdr = session;
 			executorService.submit(task);
 		}
 
 		executorService.shutdown();
 		session.close();
-		
-		HibernateUtil.close();
 	}
 
 }

@@ -57,6 +57,9 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 		super();
 		this.poHeader = poHeader;
 		this.pdfGenerator = new PDFWorkbookGenerator();
+		// somehow ini harus ada kalau fetch type PoHeader nya LAZY, kaya ga dikenalin
+		// gitu fetch nya, harus EAGER kalau ga ada ini
+		LOG.debug(poHeader.getPoDetails());
 	}
 
 	@Override
@@ -81,7 +84,8 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 			pdfGenerator.generate(rootWorksheetFolderPath, targetFile, size, PDF_TITLE, PDF_CREATOR, PDF_SUBJECT, null);
 		}
 
-		// send mail for each order (single/multiple attachments based on total attachment size)
+		// send mail for each order (single/multiple attachments based on total
+		// attachment size)
 		try {
 			long totalSize = 0;
 			MimeMessage email;
@@ -101,8 +105,7 @@ public class PurchaseOrderProcessorTask implements Callable<String>, Serializabl
 					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
 				}
 			} else {
-				LOG.info(
-						"Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
+				LOG.info("Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 
 				for (File attachment : tempFiles) {
 					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
