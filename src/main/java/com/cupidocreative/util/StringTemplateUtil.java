@@ -15,6 +15,8 @@ import com.cupidocreative.main.PDFMergerMain;
 
 public class StringTemplateUtil {
 
+	public static final char DEFAULT_DELIMITER = '$';
+	
 	/**
 	 * Create email body using StringTemplate
 	 * 
