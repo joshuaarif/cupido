@@ -3,9 +3,9 @@ package com.cupidocreative.order;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.Calendar;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,22 +13,18 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import com.cupidocreative.common.ProcessStatus;
-import com.cupidocreative.common.TaskStatus;
+import org.apache.commons.logging.Log;
+
 import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
-import com.cupidocreative.hibernate.HibernateUtil;
 import com.cupidocreative.mail.GmailSender;
 import com.cupidocreative.pdf.PDFWorkbookGenerator;
 import com.cupidocreative.util.MailUtil;
 import com.google.common.collect.Sets;
 
-public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Serializable {
+public class PurchaseOrderProcessorTask implements Callable<String>, Serializable {
 
 	private static final Log LOG = LogFactory.getLog(PurchaseOrderProcessorTask.class);
 
@@ -64,44 +60,28 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 	}
 
 	@Override
-	public TaskStatus call() throws Exception {
+	public String call() throws Exception {
 		final MailUtil mailUtil = new MailUtil();
 		final GmailSender gmailSender = new GmailSender();
 		String rootWorksheetFolderPath;
 		String targetFile;
-		String pdfFilename;
 		int size;
 		Set<File> tempFiles = Sets.newLinkedHashSetWithExpectedSize(poHeader.getPoDetails().size());
-
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Transaction t = session.beginTransaction();
 
 		// generate for each order detail
 		for (PurchaseOrderDtl orderDtl : poHeader.getPoDetails()) {
 			rootWorksheetFolderPath = orderDtl.getWorkbookCode().equals("ADDITION") ? ROOT_WORKSHEET_FOLDER_ADD
 					: ROOT_WORKSHEET_FOLDER_SUB;
-			pdfFilename = new StringBuilder().append(poHeader.getPoNumber()).append("_")
-					.append(ThreadLocalRandom.current().nextInt(9999)).append(".pdf").toString();
-			targetFile = new StringBuilder(TEMP_DIR.getPath()).append(File.separatorChar).append(pdfFilename)
-					.toString();
+			targetFile = new StringBuilder(TEMP_DIR.getPath()).append(File.separatorChar).append(poHeader.getPoNumber())
+					.append("_").append(ThreadLocalRandom.current().nextInt()).append(".pdf").toString();
 
 			size = orderDtl.getWorkbookSize();
 			tempFiles.add(new File(targetFile));
 
 			pdfGenerator.generate(rootWorksheetFolderPath, targetFile, size, PDF_TITLE, PDF_CREATOR, PDF_SUBJECT, null);
-
-			// update last udpate date
-			orderDtl.setLastUpdateDate(Calendar.getInstance().getTime());
-			session.update(orderDtl);
 		}
 
-		poHeader.setProcessStatus(ProcessStatus.GENERATED.getValue());
-		session.update(poHeader);
-
-		t.commit();
-
-		// send mail for each order (single/multiple attachments based on total
-		// attachment size)
+		// send mail for each order (single/multiple attachments based on total attachment size)
 		try {
 			long totalSize = 0;
 			MimeMessage email;
@@ -115,35 +95,29 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 				email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
 						"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
 						tempFiles);
-				// gmailSender.sendGmailMessage(GmailSender.getGmailService(),
-				// GMAIL_USER, email);
+				gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 
 				for (File attachment : tempFiles) {
 					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
 				}
 			} else {
-				LOG.info("Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
+				LOG.info(
+						"Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 
 				for (File attachment : tempFiles) {
 					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
 							"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
 							attachment);
-					// gmailSender.sendGmailMessage(GmailSender.getGmailService(),
-					// GMAIL_USER, email);
+					gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 
 					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
 				}
 			}
 			LOG.info("Mail sent to " + poHeader.getEmail());
-
-			return TaskStatus.SUCCESS;
 		} catch (MessagingException | IOException e) {
 			LOG.error("Send mail to " + poHeader.getEmail() + " failed : " + e.getMessage());
-			return TaskStatus.FAILED;
-		} finally {
-			session.close();
-			HibernateUtil.close();
 		}
+		return null;
 	}
 
 }
