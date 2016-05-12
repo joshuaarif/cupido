@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,6 +27,8 @@ import com.cupidocreative.hibernate.HibernateUtil;
 import com.cupidocreative.mail.GmailSender;
 import com.cupidocreative.pdf.PDFWorkbookGenerator;
 import com.cupidocreative.util.MailUtil;
+import com.cupidocreative.util.StringTemplateUtil;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Serializable {
@@ -108,6 +111,18 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 		try {
 			long totalSize = 0;
 			MimeMessage email;
+			Map<String, String> stValues = Maps.newHashMap();
+
+			// mail subject
+			stValues.put("poNumber", poHeader.getPoNumber());
+			String emailSubject = StringTemplateUtil.createFromST("mail/email_subject.txt",
+					StringTemplateUtil.DEFAULT_DELIMITER, stValues);
+
+			// mail body
+			stValues.clear();
+			stValues.put("name", poHeader.getEmail().split("@")[0]);
+			String emailBody = StringTemplateUtil.createFromST("mail/email_body.html",
+					StringTemplateUtil.DEFAULT_DELIMITER, stValues);
 
 			for (File f : tempFiles) {
 				totalSize += f.length();
@@ -115,8 +130,7 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 
 			if (totalSize < MAX_ATTACHMENT_SIZE) {
 				LOG.info("Sending single mail to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
-				email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
-						"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
+				email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER, emailSubject, emailBody,
 						tempFiles);
 				gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 
@@ -127,8 +141,7 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 				LOG.info("Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 
 				for (File attachment : tempFiles) {
-					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
-							"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
+					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER, emailSubject, emailBody,
 							attachment);
 					gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 
@@ -142,7 +155,8 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 
 			LOG.info("Mail sent to " + poHeader.getEmail());
 		} catch (MessagingException | IOException e) {
-			LOG.error("Send mail to " + poHeader.getEmail() + " failed : " + e.getMessage());
+			LOG.error("Send mail to " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber() + " failed : "
+					+ e.getMessage());
 			return TaskStatus.FAILED;
 		} finally {
 			session.close();

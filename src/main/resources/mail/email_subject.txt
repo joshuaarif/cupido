@@ -1,1 +1,1 @@
-Pemesanan buku: PO $poNumber$
+Delivery buku digital: PO $poNumber$
