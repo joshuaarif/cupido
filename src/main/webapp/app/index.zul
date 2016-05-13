@@ -3,26 +3,17 @@
 	<h:body>
 		<include src="/app/shared/html_head.zul" />
 
-		<h:nav class="navbar navbar-default navbar-fixed-top">
-			<h:div class="container">
-				<h:div class="navbar-header">
-					<h:button type="button"
-						class="navbar-toggle collapsed" data-toggle="collapse"
-						data-target="#navbar" aria-expanded="false"
-						aria-controls="navbar">
-						<h:span class="sr-only">
-							Toggle navigation
-						</h:span>
-						<h:span class="icon-bar"></h:span>
-						<h:span class="icon-bar"></h:span>
-						<h:span class="icon-bar"></h:span>
-					</h:button>
-					<h:a class="navbar-brand" href="#">
-						Project name
-					</h:a>
-				</h:div>
-			</h:div>
-		</h:nav>
+		<div sclass="row">
+			<div sclass="col-md-3">.col-md-3</div>
+			<div sclass="col-md-6">.col-md-6</div>
+			<div sclass="col-md-3">.col-md-3</div>
+		</div>
+
+		<button sclass="btn-primary">Primary</button>
+		<button sclass="btn-success">Success</button>
+		<button sclass="btn-info">Info</button>
+		<button sclass="btn-warning">Warning</button>
+		<button sclass="btn-danger">Danger</button>
 
 		<include src="/app/shared/html_body.zul" />
 	</h:body>
