@@ -3,59 +3,17 @@
 	<h:body>
 		<include src="/app/shared/html_head.zul" />
 
-
 		<div sclass="row">
 			<div sclass="col-md-3">.col-md-3</div>
 			<div sclass="col-md-6">.col-md-6</div>
 			<div sclass="col-md-3">.col-md-3</div>
 		</div>
 
-		<button>Default</button>
 		<button sclass="btn-primary">Primary</button>
 		<button sclass="btn-success">Success</button>
 		<button sclass="btn-info">Info</button>
 		<button sclass="btn-warning">Warning</button>
 		<button sclass="btn-danger">Danger</button>
-
-		<panel>
-			<panelchildren>Panel content</panelchildren>
-		</panel>
-
-		<panel title="Panel title">
-			<panelchildren>Panel content</panelchildren>
-		</panel>
-
-		<panel title="Panel Primary" sclass="panel-primary">
-			<panelchildren>Panel content</panelchildren>
-		</panel>
-
-		<panel title="Panel Success" sclass="panel-success">
-			<panelchildren>Panel content</panelchildren>
-		</panel>
-
-		<panel title="Panel Info" sclass="panel-info">
-			<panelchildren>Panel content</panelchildren>
-		</panel>
-
-		<panel title="Panel Warning" sclass="panel-warning">
-			<panelchildren>Panel content</panelchildren>
-		</panel>
-
-		<panel title="Panel Danger" sclass="panel-danger">
-			<panelchildren>Panel content</panelchildren>
-		</panel>
-
-		<navbar>
-			<navitem label="Link" selected="true" />
-			<navitem label="Link" />
-			<nav label="Dropdown">
-				<navitem label="Action" />
-				<navitem label="Another action" />
-				<navitem label="Something else here" />
-				<navitem label="Separated link" />
-				<navitem label="One more separated link" />
-			</nav>
-		</navbar>
 
 		<include src="/app/shared/html_body.zul" />
 	</h:body>
