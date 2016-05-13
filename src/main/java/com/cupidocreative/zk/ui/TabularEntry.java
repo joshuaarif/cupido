@@ -160,8 +160,8 @@ public class TabularEntry<T> extends Listbox {
 							}
 						}
 					}
-				} else if (component instanceof TabularListcell) {
-					TabularListcell tabularListcell = (TabularListcell) component;
+				} else if (component instanceof TabularListCell) {
+					TabularListCell tabularListcell = (TabularListCell) component;
 					if (tabularListcell.getComponentValue() instanceof InputElement) {
 						AbstractComponent ac = (AbstractComponent) tabularListcell.getComponentValue();
 						try {

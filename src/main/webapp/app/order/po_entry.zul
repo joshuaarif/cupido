@@ -9,7 +9,8 @@
 			</div>
 			<div sclass="col-md-10">
 				<textbox cols="40" maxlength="60" id="txtEmail"
-					constraint="no empty,/.+@.+\.[a-z]+/: Masukkan e-mail" />
+					constraint="no empty,/.+@.+\.[a-z]+/: Masukkan e-mail"
+					placeholder="email@domain.com" />
 			</div>
 		</div>
 		<div sclass="row">
@@ -21,39 +22,20 @@
 			</div>
 		</div>
 		<listbox id="lstPoDetail" checkmark="true" multiple="true"
-			use="com.cupidocreative.zk.ui.TabularEntry">
+			use="com.cupidocreative.zk.ui.TabularEntry" hflex="min">
 			<listhead>
-				<listheader label="" width="30px" />
-				<listheader label="Jenis" />
-				<listheader label="Halaman" width="15%" />
+				<listheader label="" hflex="min" />
+				<listheader label="Jenis" hflex="min" />
+				<listheader label="Halaman" hflex="min" />
 			</listhead>
 		</listbox>
 		<hbox>
-			<button id="btnAddRowDestination" label="Add row" />
-			<button id="btnDeleteDestination" label="Delete" />
+			<button id="btnAddPODetail" label="Add"
+				sclass="btn-primary" />
+			<button id="btnDelPODetail" label="Delete"
+				sclass="btn-warning" />
+			<button id="btnSubmit" label="Submit" sclass="btn-error" />
 		</hbox>
-		<div sclass="row">
-			<div sclass="col-md-2">
-				<label value="Type *" />
-			</div>
-			<div sclass="col-md-10">
-				<combobox id="cboType">
-					<comboitem label="Addition" value="ADDITION" />
-					<comboitem label="Subtraction" value="SUBTRACTION" />
-				</combobox>
-			</div>
-		</div>
-		<div sclass="row">
-			<div sclass="col-md-2">
-				<label value="Halaman *" />
-			</div>
-			<div sclass="col-md-10">
-				<spinner constraint="no empty" maxlength="3" />
-			</div>
-		</div>
-		<div sclass="row">
-			<button sclass="btn-primary btn-block">Submit</button>
-		</div>
 
 		<include src="/app/shared/html_body.zul" />
 	</div>

@@ -1,4 +1,4 @@
-package com.fif.hcms.core.ui.tabularentry;
+package com.cupidocreative.zk.ui;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -14,34 +14,34 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.impl.InputElement;
 import org.zkoss.zul.impl.XulElement;
 
-public abstract class TabularListcell<T, V, C extends XulElement> extends Listcell {
+public abstract class TabularListCell<T, V, C extends XulElement> extends Listcell {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory.getLogger(TabularListcell.class);
+	private static final Logger logger = LoggerFactory.getLogger(TabularListCell.class);
 
 	protected T data;
 	protected String fieldName;
 	protected C component;
 	protected V initialValue;
 
-	public TabularListcell(T data, V value, String fieldName) {
+	public TabularListCell(T data, V value, String fieldName) {
 		this(data, value, fieldName, false);
 	}
 
-	public TabularListcell(T data, V value, String fieldName, boolean readonly) {
+	public TabularListCell(T data, V value, String fieldName, boolean readonly) {
 		this(data, value, fieldName, Events.ON_BLUR, readonly, 25, "", null);
 	}
 
-	public TabularListcell(T data, V value, String fieldName, boolean readonly, int maxLength, String width) {
+	public TabularListCell(T data, V value, String fieldName, boolean readonly, int maxLength, String width) {
 		this(data, value, fieldName, Events.ON_BLUR, readonly, maxLength, width, null);
 	}
 
-	public TabularListcell(T data, V value, String fieldName, String event) {
+	public TabularListCell(T data, V value, String fieldName, String event) {
 		this(data, value, fieldName, event, false, 25, "", null);
 	}
 
-	public TabularListcell(T data, V value, String fieldName, String event, boolean readonly, int maxLength,
+	public TabularListCell(T data, V value, String fieldName, String event, boolean readonly, int maxLength,
 			String width, V initialValue) {
 		this.data = data;
 		this.fieldName = fieldName;
