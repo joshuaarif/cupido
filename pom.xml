@@ -6,7 +6,7 @@
 	<version>1.0.0-BETA</version>
 
 	<properties>
-		<java.sdk.version>1.7</java.sdk.version>
+		<java.sdk.version>1.8</java.sdk.version>
 		<apache.poi.version>3.14</apache.poi.version>
 		<apache.pdfbox.version>2.0.1</apache.pdfbox.version>
 		<commons.io.version>2.5</commons.io.version>
