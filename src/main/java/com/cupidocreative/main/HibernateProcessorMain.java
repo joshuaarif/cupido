@@ -37,7 +37,7 @@ public class HibernateProcessorMain {
 		// start create from order
 		for (PurchaseOrderHdr o : orders) {
 			LOG.info("Processing : " + o.getPoNumber());
-			PurchaseOrderProcessorTask task = new PurchaseOrderProcessorTask(o);
+			PurchaseOrderProcessorTask task = new PurchaseOrderProcessorTask(o, true, false);
 			executorService.submit(task);
 		}
 

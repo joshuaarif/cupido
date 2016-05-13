@@ -1,0 +1,14 @@
+<?page title="" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:h="native">
+	<div sclass="card z-depth-1 animated wobble in">
+		<div sclass="card-body card-padding bgm-red c-white">
+			<h:i class="zmdi zmdi-hc-lg zmdi-alert-circle-o p-r-10">
+			</h:i>
+			<h:strong>
+				Untuk keperluan teknis development, hanya boleh
+				menggunakan environment development (database,
+				application server)
+			</h:strong>
+		</div>
+	</div>
+</zk>

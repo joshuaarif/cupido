@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,6 +27,8 @@ import com.cupidocreative.hibernate.HibernateUtil;
 import com.cupidocreative.mail.GmailSender;
 import com.cupidocreative.pdf.PDFWorkbookGenerator;
 import com.cupidocreative.util.MailUtil;
+import com.cupidocreative.util.StringTemplateUtil;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Serializable {
@@ -50,6 +53,8 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 
 	private PurchaseOrderHdr poHeader;
 	private PDFWorkbookGenerator pdfGenerator;
+	private boolean generatePdf;
+	private boolean sendMail;
 
 	static {
 		if (!TEMP_DIR.exists()) {
@@ -57,10 +62,24 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 		}
 	}
 
-	public PurchaseOrderProcessorTask(PurchaseOrderHdr poHeader) {
+	/**
+	 * 
+	 * @param poHeader
+	 * @param generatePdf
+	 * @param sendMail
+	 *            if true & mail succesfully sent, will delete temporary files
+	 */
+	public PurchaseOrderProcessorTask(PurchaseOrderHdr poHeader, boolean generatePdf, boolean sendMail) {
 		super();
+
+		if (!(generatePdf || sendMail)) {
+			throw new IllegalArgumentException("Must generatePdf, sendMail, or both");
+		}
+
 		this.poHeader = poHeader;
 		this.pdfGenerator = new PDFWorkbookGenerator();
+		this.generatePdf = generatePdf;
+		this.sendMail = sendMail;
 		// somehow ini harus ada kalau fetch type PoHeader nya LAZY, kaya ga
 		// dikenalin
 		// gitu fetch nya, harus EAGER kalau ga ada ini
@@ -79,73 +98,89 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 		Transaction t = session.beginTransaction();
 
 		// generate for each order detail
-		for (PurchaseOrderDtl orderDtl : poHeader.getPoDetails()) {
-			rootWorksheetFolderPath = orderDtl.getWorkbookCode().equals("ADDITION") ? ROOT_WORKSHEET_FOLDER_ADD
-					: ROOT_WORKSHEET_FOLDER_SUB;
-			String pdfFilename = new StringBuilder().append(poHeader.getPoNumber()).append("_")
-					.append(ThreadLocalRandom.current().nextInt(1000, 9999)).append(".pdf").toString();
-			targetFile = new StringBuilder(TEMP_DIR.getPath()).append(File.separatorChar).append(pdfFilename)
-					.toString();
+		if (generatePdf) {
+			for (PurchaseOrderDtl orderDtl : poHeader.getPoDetails()) {
+				rootWorksheetFolderPath = orderDtl.getWorkbookCode().equals("ADDITION") ? ROOT_WORKSHEET_FOLDER_ADD
+						: ROOT_WORKSHEET_FOLDER_SUB;
+				String pdfFilename = new StringBuilder().append(poHeader.getPoNumber()).append("_")
+						.append(ThreadLocalRandom.current().nextInt(1000, 9999)).append(".pdf").toString();
+				targetFile = new StringBuilder(TEMP_DIR.getPath()).append(File.separatorChar).append(pdfFilename)
+						.toString();
 
-			size = orderDtl.getWorkbookSize();
-			tempFiles.add(new File(targetFile));
+				size = orderDtl.getWorkbookSize();
+				tempFiles.add(new File(targetFile));
 
-			pdfGenerator.generate(rootWorksheetFolderPath, targetFile, size, PDF_TITLE, PDF_CREATOR, PDF_SUBJECT, null);
+				pdfGenerator.generate(rootWorksheetFolderPath, targetFile, size, PDF_TITLE, PDF_CREATOR, PDF_SUBJECT,
+						null);
 
-			orderDtl.setLastUpdateDate(Calendar.getInstance().getTime());
-			orderDtl.setPdfFilename(pdfFilename);
-			session.update(orderDtl);
+				orderDtl.setLastUpdateDate(Calendar.getInstance().getTime());
+				orderDtl.setPdfFilename(pdfFilename);
+				session.update(orderDtl);
+			}
+
+			poHeader.setProcessStatus(ProcessStatus.GENERATED.getValue());
+			session.update(poHeader);
+
+			t.commit();
+			session.flush();
 		}
-
-		poHeader.setProcessStatus(ProcessStatus.GENERATED.getValue());
-		session.update(poHeader);
-
-		t.commit();
-		session.flush();
 
 		// send mail for each order (single/multiple attachments based on total
 		// attachment size)
-		try {
-			long totalSize = 0;
-			MimeMessage email;
+		if (sendMail) {
+			try {
+				long totalSize = 0;
+				MimeMessage email;
+				Map<String, String> stValues = Maps.newHashMap();
 
-			for (File f : tempFiles) {
-				totalSize += f.length();
-			}
+				// mail subject
+				stValues.put("poNumber", poHeader.getPoNumber());
+				String emailSubject = StringTemplateUtil.createFromST("mail/email_subject.txt",
+						StringTemplateUtil.DEFAULT_DELIMITER, stValues);
 
-			if (totalSize < MAX_ATTACHMENT_SIZE) {
-				LOG.info("Sending single mail to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
-				email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
-						"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
-						tempFiles);
-				gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+				// mail body
+				stValues.clear();
+				stValues.put("name", poHeader.getEmail().split("@")[0]);
+				String emailBody = StringTemplateUtil.createFromST("mail/email_body.html",
+						StringTemplateUtil.DEFAULT_DELIMITER, stValues);
 
-				for (File attachment : tempFiles) {
-					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
+				for (File f : tempFiles) {
+					totalSize += f.length();
 				}
-			} else {
-				LOG.info("Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 
-				for (File attachment : tempFiles) {
-					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER,
-							"PO : " + poHeader.getPoNumber() + ThreadLocalRandom.current().nextInt(), "emailBody",
-							attachment);
+				if (totalSize < MAX_ATTACHMENT_SIZE) {
+					LOG.info("Sending single mail to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
+					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER, emailSubject, emailBody,
+							tempFiles);
 					gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
 
-					Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
+					for (File attachment : tempFiles) {
+						Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
+					}
+				} else {
+					LOG.info("Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
+
+					for (File attachment : tempFiles) {
+						email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER, emailSubject,
+								emailBody, attachment);
+						gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+
+						Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
+					}
 				}
+				poHeader.setProcessStatus(ProcessStatus.COMPLETE.getValue());
+				session.update(poHeader);
+
+				session.flush();
+
+				LOG.info("Mail sent to " + poHeader.getEmail());
+			} catch (MessagingException | IOException e) {
+				LOG.error("Send mail to " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber() + " failed : "
+						+ e.getMessage());
+				return TaskStatus.FAILED;
+			} finally {
+				session.close();
 			}
-			poHeader.setProcessStatus(ProcessStatus.COMPLETE.getValue());
-			session.update(poHeader);
-
-			session.flush();
-
-			LOG.info("Mail sent to " + poHeader.getEmail());
-		} catch (MessagingException | IOException e) {
-			LOG.error("Send mail to " + poHeader.getEmail() + " failed : " + e.getMessage());
-			return TaskStatus.FAILED;
-		} finally {
-			session.close();
 		}
 
 		return TaskStatus.SUCCESS;

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="p"?>
+
+<zk xmlns:h="native">
+	<h:div>
+		<![CDATA[<!--[if IE 9 ]><html class="ie9"><![endif]--> ]]>
+	</h:div>
+	<h:head>
+		<h:meta charset="utf-8" />
+		<h:meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<h:meta name="viewport"
+			content="width=device-width, initial-scale=1" />
+		<!-- CSS -->
+		<h:link href="${p:encodeURL('/css/bootstrap.min.css')}"
+			rel="stylesheet" />
+	</h:head>
+</zk>

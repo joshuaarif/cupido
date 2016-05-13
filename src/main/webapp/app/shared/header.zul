@@ -1,0 +1,18 @@
+<?page contentType="text/html;charset=UTF-8"?>
+<zk xmlns:h="native">
+	<h:header id="header" class="clearfix" data-current-skin="blue">
+		<h:ul class="header-inner">
+			<h:li id="menu-trigger" data-trigger="#sidebar">
+				<h:div class="line-wrap">
+					<h:div class="line top"></h:div>
+					<h:div class="line center"></h:div>
+					<h:div class="line bottom"></h:div>
+				</h:div>
+			</h:li>
+
+			<h:li class="logo hidden-xs">
+				<a href="/">IT Development Standard</a>
+			</h:li>
+		</h:ul>
+	</h:header>
+</zk>

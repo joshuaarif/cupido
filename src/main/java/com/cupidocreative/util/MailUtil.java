@@ -92,6 +92,7 @@ public class MailUtil {
 		mimeBodyPart.setHeader("Content-Type", "text/html; charset=\"UTF-8\"");
 
 		Multipart multipart = new MimeMultipart();
+		multipart.addBodyPart(mimeBodyPart);
 
 		for (File f : attachment) {
 			mimeBodyPart = new MimeBodyPart();
