@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.google.common.collect.Lists;
@@ -22,7 +23,8 @@ public class PurchaseOrderHdr implements Serializable {
 	private static final long serialVersionUID = 6106622432348004462L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "po_hdr_s")
+	@SequenceGenerator(name = "po_hdr_s", sequenceName = "po_hdr_s", allocationSize = 1, initialValue = 1)
 	@Column(name = "po_hdr_id", nullable = false, unique = true)
 	private long id;
 

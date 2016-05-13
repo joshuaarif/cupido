@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -25,7 +26,8 @@ public class PurchaseOrderDtl implements Serializable {
 
 	@Id
 	@Column(name = "po_dtl_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "po_dtl_s")
+	@SequenceGenerator(name = "po_dtl_s", sequenceName = "po_dtl_s", allocationSize = 1, initialValue = 1)
 	private long id;
 
 	@Column(name = "workbook_code", length = 100, nullable = false)
@@ -156,6 +158,10 @@ public class PurchaseOrderDtl implements Serializable {
 
 	public void setPdfFilename(String pdfFilename) {
 		this.pdfFilename = pdfFilename;
+	}
+
+	public boolean isEmpty() {
+		return this.getWorkbookSize() < 1 || this.getWorkbookCode() == null || this.getWorkbookCode().length() < 1;
 	}
 
 }
