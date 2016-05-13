@@ -54,7 +54,7 @@ public class PDFMergerMain {
 
 		// start create from order
 		for (PurchaseOrderHdr o : orders) {
-			PurchaseOrderProcessorTask task = new PurchaseOrderProcessorTask(o);
+			PurchaseOrderProcessorTask task = new PurchaseOrderProcessorTask(o, false, false);
 			executorService.submit(task);
 		}
 
