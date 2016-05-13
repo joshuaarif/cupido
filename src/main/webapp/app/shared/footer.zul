@@ -1,0 +1,8 @@
+<?page contentType="text/html;charset=UTF-8"?>
+<zk xmlns:h="native">
+	<h:footer>
+		<div sclass="p-t-10 p-b-10 text-center">
+			<h:small>Copyright 2016 FIFGroup</h:small>
+		</div>
+	</h:footer>
+</zk>
