@@ -13,5 +13,7 @@
 		<!-- CSS -->
 		<h:link href="${p:encodeURL('/css/bootstrap.min.css')}"
 			rel="stylesheet" />
+		<h:link href="${p:encodeURL('/css/app.css')}"
+			rel="stylesheet" />
 	</h:head>
 </zk>
