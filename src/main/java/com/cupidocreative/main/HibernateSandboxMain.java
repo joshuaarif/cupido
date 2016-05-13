@@ -1,11 +1,11 @@
 package com.cupidocreative.main;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
@@ -19,7 +19,6 @@ public class HibernateSandboxMain {
 		Set<PurchaseOrderHdr> orders = Sets.newLinkedHashSet();
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		Session sessionPoNumber = HibernateUtil.getSessionFactory().openSession();
-		Transaction t = session.beginTransaction();
 
 		for (int i = 0; i < 2000; i++) {
 			// get PO number
@@ -41,12 +40,14 @@ public class HibernateSandboxMain {
 			}
 
 			sessionPoNumber.flush();
-			
+
+			System.out.println(poHeaderNumber);
+
 			PurchaseOrderHdr order = new PurchaseOrderHdr();
 			order.setEmail((i % 2 == 0 ? "xxx@gmail.com" : "yyy@yahoo.com"));
 			order.setPoNumber("PO" + poHeaderNumber.getSequence());
 
-			for (int j = 0; j < 2000; j++) {
+			for (int j = 0; j < 20; j++) {
 				PurchaseOrderDtl orderDtl = new PurchaseOrderDtl();
 				orderDtl.setPoHeader(order);
 
@@ -58,11 +59,14 @@ public class HibernateSandboxMain {
 
 			orders.add(order);
 
-			System.out.println(poHeaderNumber);
+			order.setCreatedBy(-1);
+			order.setCreationDate(new Date());
+			order.setLastUpdateDate(new Date());
+			order.setLastUpdatedBy(-1);
+			session.save(order);
 			session.flush();
 		}
 
-		t.commit();
 		session.close();
 		sessionPoNumber.close();
 
