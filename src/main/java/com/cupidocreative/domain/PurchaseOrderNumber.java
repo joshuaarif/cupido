@@ -17,6 +17,7 @@ public class PurchaseOrderNumber implements Serializable {
 	@Id
 	private int year;
 
+	// non id column (tanpa @Id) tidak bisa ambil dari sequence hibernate
 	@Column(nullable = false, length = 6)
 	private int sequence;
 
