@@ -112,9 +112,9 @@ public class PurchaseOrderDtl implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("PurchaseOrderDtl [poHeader=").append(poHeader.getPoNumber()).append(", id=").append(id)
-				.append(", workbookCode=").append(workbookCode).append(", workbookSize=").append(workbookSize)
-				.append("]");
+		builder.append("PurchaseOrderDtl [poHeader=").append(poHeader == null ? "null" : poHeader.getPoNumber())
+				.append(", id=").append(id).append(", workbookCode=").append(workbookCode).append(", workbookSize=")
+				.append(workbookSize).append("]");
 		return builder.toString();
 	}
 
