@@ -38,7 +38,8 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 	private static final File TEMP_DIR = new File("D:/Personal/Cupido/PO");
 	private static final String ROOT_WORKSHEET_FOLDER_ADD = "D:/Personal/Dropbox/Cupido/Education/Worksheet/Generator/Addition/1-10/worksheet";
 	private static final String ROOT_WORKSHEET_FOLDER_SUB = "D:/Personal/Dropbox/Cupido/Education/Worksheet/Generator/Subtraction/1-20/worksheet";
-
+	private static final String FOOTER_IMAGE = "D:/Personal/Cupido/Footer.png";
+	
 	private static final String PDF_TITLE = "Cupido Creative";
 	private static final String PDF_CREATOR = "www.cupidocreative.com";
 	private static final String PDF_SUBJECT = "Buku Latihan Cupido Creative, lihat lengkapnya di www.cupidocreative.com";
@@ -111,7 +112,7 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 				tempFiles.add(new File(targetFile));
 
 				pdfGenerator.generate(rootWorksheetFolderPath, targetFile, size, PDF_TITLE, PDF_CREATOR, PDF_SUBJECT,
-						null);
+						FOOTER_IMAGE);
 
 				orderDtl.setLastUpdateDate(Calendar.getInstance().getTime());
 				orderDtl.setPdfFilename(pdfFilename);
