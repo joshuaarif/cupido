@@ -1,5 +1,8 @@
 <?page title="" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:h="native">
-	<script src="js/jquery.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/zk-button.js" />
+	<script src="/js/zk-panel.js" />
+	<script src="/js/zk-navbar.js" />
 </zk>
