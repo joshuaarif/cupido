@@ -18,29 +18,28 @@
 				<label value="Nomor PO" />
 			</div>
 			<div sclass="col-md-10">
-				<label id="lblPoNumber" />
+				<textbox cols="10" maxlength="10" id="txtPONumber" />
 			</div>
 		</div>
-		<listbox id="lstPoDetails" checkmark="true"
-			use="com.cupidocreative.zk.ui.TabularEntry" hflex="min">
+		<div sclass="row">
+			<div sclass="col-md-2"></div>
+			<div sclass="col-md-10">
+				<hbox>
+					<button id="btnFind" label="Cari"
+						sclass="btn-primary" />
+				</hbox>
+			</div>
+		</div>
+		<listbox id="lstPoHeaders" hflex="min">
 			<listhead>
-				<listheader label="" hflex="min" />
-				<listheader label="Jenis" hflex="min" />
-				<listheader label="Halaman" hflex="min" />
+				<listheader label="Nomor PO" hflex="min" />
+				<listheader label="Tanggal PO" hflex="min" />
 				<listheader label="Harga" hflex="min" />
+				<listheader label="Status pembayaran" hflex="min" />
+				<listheader label="Status pemesanan" hflex="min" />
 			</listhead>
 		</listbox>
-		<hbox>
-			<button id="btnAddPODetail" label="Add"
-				sclass="btn-primary" />
-			<button id="btnDelPODetail" label="Delete"
-				sclass="btn-warning" />
-			<button id="btnSubmit" label="Submit" sclass="btn-error" />
-		</hbox>
-		<hbox>
-			<label value="Total harga " />
-			<label id="lblTotalPrice" />
-		</hbox>
+
 		<include src="/app/shared/html_body.zul" />
 	</div>
 </zk>
