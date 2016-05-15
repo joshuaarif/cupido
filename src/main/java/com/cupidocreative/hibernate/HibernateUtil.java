@@ -4,6 +4,7 @@ import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -25,7 +26,11 @@ public class HibernateUtil {
 		return sessionFactory;
 	}
 	
-	public static void close() {
+	public static Session openSession() {
+		return sessionFactory.openSession();
+	}
+	
+	public static void closeSessionFactory() {
 		getSessionFactory().close();
 	}
 
