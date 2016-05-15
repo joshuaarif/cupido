@@ -2,6 +2,7 @@ package com.cupidocreative.dao;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -10,9 +11,9 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.cupidocreative.domain.PurchaseOrderNumber;
 import com.cupidocreative.hibernate.HibernateUtil;
@@ -28,6 +29,7 @@ public class PurchaseOrderDAO {
 		try (Session session = HibernateUtil.openSession()) {
 			StringBuilder sb = new StringBuilder(" from PurchaseOrderNumber where year = ")
 					.append(Calendar.getInstance().get(Calendar.YEAR));
+			@SuppressWarnings("rawtypes")
 			List result = session.createQuery(sb.toString()).list();
 			Transaction t = session.beginTransaction();
 
@@ -84,8 +86,8 @@ public class PurchaseOrderDAO {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<PurchaseOrderHdr> findPoHeaders(String email, String poNumber, List<String> paymentStatus,
-			List<String> processStatus) {
+	public List<PurchaseOrderHdr> findPoHeaders(String email, String poNumber, Set<String> paymentStatus,
+			Set<String> processStatus) {
 		List<PurchaseOrderHdr> result = null;
 		Session session = HibernateUtil.openSession();
 		Criteria c = session.createCriteria(PurchaseOrderHdr.class);
@@ -109,6 +111,8 @@ public class PurchaseOrderDAO {
 				c.add(Restrictions.eq("processStatus", s));
 			});
 		}
+
+		c.addOrder(Order.desc("id"));
 
 		result = (List<PurchaseOrderHdr>) c.list();
 

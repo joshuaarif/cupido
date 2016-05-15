@@ -1,6 +1,6 @@
 <?page title="Index" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:h="native">
-	<div apply="com.cupidocreative.zk.composer.ZkPOEntryComposer">
+	<div apply="com.cupidocreative.zk.composer.ZkPOInquiryComposer">
 		<include src="/app/shared/html_head.zul" />
 
 		<div sclass="row">
@@ -30,7 +30,8 @@
 				</hbox>
 			</div>
 		</div>
-		<listbox id="lstPoHeaders" hflex="min">
+		<listbox id="lstPoHeaders" hflex="min"
+			emptyMessage="Tidak ada data yang ditemukan">
 			<listhead>
 				<listheader label="Nomor PO" hflex="min" />
 				<listheader label="Tanggal PO" hflex="min" />
@@ -38,6 +39,15 @@
 				<listheader label="Status pembayaran" hflex="min" />
 				<listheader label="Status pemesanan" hflex="min" />
 			</listhead>
+			<template name="model">
+				<listitem>
+					<listcell label="${each.poNumber}"></listcell>
+					<listcell label="${each.creationDate}"></listcell>
+					<listcell label="${each.priceInvoice}"></listcell>
+					<listcell label="${each.paymentStatus}"></listcell>
+					<listcell label="${each.processStatus}"></listcell>
+				</listitem>
+			</template>
 		</listbox>
 
 		<include src="/app/shared/html_body.zul" />

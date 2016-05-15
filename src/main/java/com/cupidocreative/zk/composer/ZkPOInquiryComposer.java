@@ -2,15 +2,20 @@ package com.cupidocreative.zk.composer;
 
 import java.util.List;
 
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 import com.cupidocreative.dao.PurchaseOrderDAO;
 import com.cupidocreative.domain.PurchaseOrderHdr;
+import com.google.common.collect.Lists;
 
 public class ZkPOInquiryComposer extends SelectorComposer<Div> {
 
@@ -28,21 +33,36 @@ public class ZkPOInquiryComposer extends SelectorComposer<Div> {
 
 	private PurchaseOrderDAO poDAO = new PurchaseOrderDAO();
 
-	private List<PurchaseOrderHdr> poHeaders;
+	private List<PurchaseOrderHdr> poHeaders = Lists.newArrayList();
 
 	@Wire
 	private Button btnFind;
 
+	@Override
+	public void doAfterCompose(Div comp) throws Exception {
+		super.doAfterCompose(comp);
+
+		lstPoHeaders.setModel(new ListModelList<>(poHeaders));
+
+		btnFind.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event arg0) throws Exception {
+				String email = txtEmail.getValue().trim();
+				String poNumber = txtPONumber.getValue().trim();
+
+				poHeaders = poDAO.findPoHeaders(email, poNumber, null, null);
+			poHeaders.forEach(d -> System.out.println(d.getPoNumber()));
+			}
+		});
+	}
+
+	// @Listen("onClick = #btnFind")
 	public void onFind() {
 		String email = txtEmail.getValue().trim();
 		String poNumber = txtPONumber.getValue().trim();
 
 		poHeaders = poDAO.findPoHeaders(email, poNumber, null, null);
-	}
-
-	@Override
-	public void doAfterCompose(Div comp) throws Exception {
-		super.doAfterCompose(comp);
 	}
 
 }
