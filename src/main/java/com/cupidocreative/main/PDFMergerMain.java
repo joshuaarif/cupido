@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.cupidocreative.domain.PurchaseOrderHdr;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.cupidocreative.order.PurchaseOrderProcessorTask;
 import com.cupidocreative.order.XlsxReader;
 

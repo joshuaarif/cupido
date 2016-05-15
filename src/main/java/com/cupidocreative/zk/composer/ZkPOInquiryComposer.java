@@ -13,8 +13,8 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
-import com.cupidocreative.dao.PurchaseOrderDAO;
-import com.cupidocreative.domain.PurchaseOrderHdr;
+import com.cupidocreative.hibernate.dao.PurchaseOrderDAO;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.google.common.collect.Lists;
 
 public class ZkPOInquiryComposer extends SelectorComposer<Div> {

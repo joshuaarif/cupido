@@ -21,9 +21,9 @@ import org.hibernate.Transaction;
 
 import com.cupidocreative.common.ProcessStatus;
 import com.cupidocreative.common.TaskStatus;
-import com.cupidocreative.domain.PurchaseOrderDtl;
-import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.cupidocreative.hibernate.HibernateUtil;
+import com.cupidocreative.hibernate.domain.PurchaseOrderDtl;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.cupidocreative.mail.GmailSender;
 import com.cupidocreative.pdf.PDFWorkbookGenerator;
 import com.cupidocreative.util.MailUtil;

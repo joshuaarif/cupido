@@ -27,11 +27,11 @@ import org.zkoss.zul.Textbox;
 
 import com.cupidocreative.common.PaymentStatus;
 import com.cupidocreative.common.ProcessStatus;
-import com.cupidocreative.dao.PurchaseOrderDAO;
-import com.cupidocreative.domain.PurchaseOrderDtl;
-import com.cupidocreative.domain.PurchaseOrderHdr;
-import com.cupidocreative.domain.PurchaseOrderNumber;
 import com.cupidocreative.hibernate.HibernateUtil;
+import com.cupidocreative.hibernate.dao.PurchaseOrderDAO;
+import com.cupidocreative.hibernate.domain.PurchaseOrderDtl;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
+import com.cupidocreative.hibernate.domain.PurchaseOrderNumber;
 import com.cupidocreative.zk.ui.ComboboxListCell;
 import com.cupidocreative.zk.ui.SpinnerListCell;
 import com.cupidocreative.zk.ui.TabularEntry;

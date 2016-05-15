@@ -1,4 +1,4 @@
-package com.cupidocreative.dao;
+package com.cupidocreative.hibernate.dao;
 
 import java.util.Calendar;
 import java.util.List;
@@ -14,9 +14,9 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import com.cupidocreative.domain.PurchaseOrderHdr;
-import com.cupidocreative.domain.PurchaseOrderNumber;
 import com.cupidocreative.hibernate.HibernateUtil;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
+import com.cupidocreative.hibernate.domain.PurchaseOrderNumber;
 import com.google.common.collect.Lists;
 
 public class PurchaseOrderDAO {

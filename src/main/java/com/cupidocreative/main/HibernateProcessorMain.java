@@ -11,8 +11,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.cupidocreative.hibernate.HibernateUtil;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.cupidocreative.order.PurchaseOrderProcessorTask;
 
 public class HibernateProcessorMain {

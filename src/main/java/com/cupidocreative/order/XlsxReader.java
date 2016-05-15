@@ -16,8 +16,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.cupidocreative.domain.PurchaseOrderDtl;
-import com.cupidocreative.domain.PurchaseOrderHdr;
+import com.cupidocreative.hibernate.domain.PurchaseOrderDtl;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.google.api.client.util.Maps;
 import com.google.common.collect.Sets;
 

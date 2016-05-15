@@ -1,4 +1,4 @@
-package com.cupidocreative.domain;
+package com.cupidocreative.hibernate.domain;
 
 import java.io.Serializable;
 import java.util.Date;

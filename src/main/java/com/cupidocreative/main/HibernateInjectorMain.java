@@ -8,10 +8,10 @@ import org.hibernate.Transaction;
 
 import com.cupidocreative.common.PaymentStatus;
 import com.cupidocreative.common.ProcessStatus;
-import com.cupidocreative.dao.PurchaseOrderDAO;
-import com.cupidocreative.domain.PurchaseOrderDtl;
-import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.cupidocreative.hibernate.HibernateUtil;
+import com.cupidocreative.hibernate.dao.PurchaseOrderDAO;
+import com.cupidocreative.hibernate.domain.PurchaseOrderDtl;
+import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.cupidocreative.order.XlsxReader;
 
 public class HibernateInjectorMain {
