@@ -1,11 +1,10 @@
 package com.cupidocreative.main;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import com.cupidocreative.dao.PurchaseOrderDAO;
 import com.cupidocreative.domain.PurchaseOrderDtl;
@@ -28,26 +27,31 @@ public class HibernateSandboxMain {
 			order.setEmail((i % 2 == 0 ? "xxx@gmail.com" : "yyy@yahoo.com"));
 			order.setPoNumber("PO" + poHeaderNumber.getSequence());
 
+			order.setCreatedBy(-1);
+			order.setCreationDate(new Date());
+			order.setLastUpdateDate(new Date());
+			order.setLastUpdatedBy(-1);
+
 			for (int j = 0; j < 20; j++) {
 				PurchaseOrderDtl orderDtl = new PurchaseOrderDtl();
 				orderDtl.setPoHeader(order);
 
 				orderDtl.setWorkbookCode((i % 2 == 0 ? "CODE_A" : "CODE_B"));
 				orderDtl.setWorkbookSize(1);
+				orderDtl.setCreationDate(new Date());
+				orderDtl.setLastUpdateDate(new Date());
 
 				order.getPoDetails().add(orderDtl);
 			}
 
 			orders.add(order);
 
-			order.setCreatedBy(-1);
-			order.setCreationDate(new Date());
-			order.setLastUpdateDate(new Date());
-			order.setLastUpdatedBy(-1);
+		}
 
+		for (PurchaseOrderHdr order : orders) {
 			poDAO.save(order);
 		}
-		
+
 		HibernateUtil.closeSessionFactory();
 	}
 

@@ -5,6 +5,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.InputEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -23,6 +27,7 @@ import org.zkoss.zul.Textbox;
 
 import com.cupidocreative.common.PaymentStatus;
 import com.cupidocreative.common.ProcessStatus;
+import com.cupidocreative.dao.PurchaseOrderDAO;
 import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.cupidocreative.domain.PurchaseOrderNumber;
@@ -33,7 +38,7 @@ import com.cupidocreative.zk.ui.TabularEntry;
 import com.google.common.collect.Lists;
 
 @VariableResolver(DelegatingVariableResolver.class)
-public class ZkEntryPOComposer extends SelectorComposer<Div> {
+public class ZkPOEntryComposer extends SelectorComposer<Div> {
 
 	private static final long serialVersionUID = -2717733290837314444L;
 
@@ -53,6 +58,8 @@ public class ZkEntryPOComposer extends SelectorComposer<Div> {
 	// end of UI Wire
 
 	private List<PurchaseOrderDtl> poDetails;
+
+	private PurchaseOrderDAO poDAO = new PurchaseOrderDAO();
 
 	@Override
 	public void doAfterCompose(Div comp) throws Exception {
@@ -77,6 +84,56 @@ public class ZkEntryPOComposer extends SelectorComposer<Div> {
 		return new ListModelList<PurchaseOrderDtl>(poDetails);
 	}
 
+	private ListitemRenderer<PurchaseOrderDtl> getPODetailRenderer() {
+		ListitemRenderer<PurchaseOrderDtl> renderer = new ListitemRenderer<PurchaseOrderDtl>() {
+
+			@Override
+			public void render(Listitem item, PurchaseOrderDtl data, int index) throws Exception {
+				// item dummy ini harus ada, karena entah gimana, user harus
+				// pilih dulu itemnya, baru commbobox nya bisa dimapping ke pojo
+				Comboitem itemDummy = new Comboitem("-- Pilih produk --");
+				Comboitem itemAddition = new Comboitem("Addition");
+				Comboitem itemSubtraction = new Comboitem("Subtraction");
+				ComboboxListCell<PurchaseOrderDtl> cboWorkbookCode = new ComboboxListCell<PurchaseOrderDtl>(data,
+						data.getWorkbookCode(), "workbookCode");
+				cboWorkbookCode.getComponent().appendChild(itemDummy);
+				cboWorkbookCode.getComponent().appendChild(itemAddition);
+				cboWorkbookCode.getComponent().appendChild(itemSubtraction);
+				cboWorkbookCode.getComponent().setSelectedIndex(0);
+
+				SpinnerListCell<PurchaseOrderDtl> spnWorkbookSize = new SpinnerListCell<PurchaseOrderDtl>(data,
+						data.getWorkbookSize(), "workbookSize");
+				spnWorkbookSize.getComponent().setConstraint("no empty, min 0 max 150");
+				spnWorkbookSize.getComponent().setCols(4);
+				spnWorkbookSize.addEventListener(Events.ON_BLUR, new EventListener<Event>() {
+					@Override
+					public void onEvent(Event event) throws Exception {
+						int value = spnWorkbookSize.getValue();
+
+						System.out.println(value * PurchaseOrderDtl.PRICE_BASE_PER_PAGE);
+						txtEmail.setValue("blur " + value * 111);
+					}
+				});
+
+				spnWorkbookSize.addEventListener("onChange", new EventListener<InputEvent>() {
+					@Override
+					public void onEvent(InputEvent event) throws Exception {
+						int value = Integer.parseInt(event.getValue());
+
+						System.out.println("Value from event : " + value * 400);
+						txtEmail.setValue("change " + value * 111);
+					}
+				});
+
+				item.appendChild(new Listcell());
+				item.appendChild(cboWorkbookCode);
+				item.appendChild(spnWorkbookSize);
+			}
+		};
+
+		return renderer;
+	}
+
 	@Listen("onClick = #btnAddPODetail")
 	public void onAddPODetail() {
 		lstPoDetails.addRow();
@@ -94,26 +151,14 @@ public class ZkEntryPOComposer extends SelectorComposer<Div> {
 
 		PurchaseOrderHdr poHeader = populatePurchaseOrder();
 
-		System.out.println(poHeader);
-
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		session.save(poHeader);
-		session.close();
-		HibernateUtil.close();
-
-		System.out.println("Saved");
+		// HibernateUtil.close();
 	}
 
 	private PurchaseOrderHdr populatePurchaseOrder() {
 		PurchaseOrderHdr poHeader = new PurchaseOrderHdr();
-
-		// get PO number
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		StringBuilder sb = new StringBuilder(" from PurchaseOrderNumber where year = ")
-				.append(Calendar.getInstance().get(Calendar.YEAR));
-		PurchaseOrderNumber poHeaderNumber = (PurchaseOrderNumber) session.createQuery(sb.toString()).list().get(0);
-
 		Date now = Calendar.getInstance().getTime();
+
+		PurchaseOrderNumber poHeaderNumber = poDAO.getPoNumber();
 
 		poHeader.setEmail(txtEmail.getValue());
 		poHeader.setCreatedBy(-1);
@@ -122,9 +167,11 @@ public class ZkEntryPOComposer extends SelectorComposer<Div> {
 		poHeader.setLastUpdatedBy(-1);
 		poHeader.setPayment_status(PaymentStatus.NEW.getValue());
 		poHeader.setProcessStatus(ProcessStatus.NEW.getValue());
+		poHeader.setPoNumber(Integer.toString(poHeaderNumber.getSequence()));
 
 		// set po detail (model)
-		// index based, karena disini id nya masih 0 semua, sehingga equals nya
+		// index based, karena disini id nya masih 0 semua, sehingga equals
+		// nya
 		// akan menghasilkan duplikat dan tidak bisa di remove by object
 		poDetails.clear();
 
@@ -146,37 +193,9 @@ public class ZkEntryPOComposer extends SelectorComposer<Div> {
 
 		poHeader.setPoDetails(poDetails);
 
+		poDAO.save(poHeader);
+
 		return poHeader;
-	}
-
-	private ListitemRenderer<PurchaseOrderDtl> getPODetailRenderer() {
-		ListitemRenderer<PurchaseOrderDtl> renderer = new ListitemRenderer<PurchaseOrderDtl>() {
-
-			@Override
-			public void render(Listitem item, PurchaseOrderDtl data, int index) throws Exception {
-				// item dummy ini harus ada, karena entah gimana, user harus
-				// pilih dulu itemnya, baru commbobox nya bisa dimapping ke pojo
-				Comboitem itemDummy = new Comboitem("-- Pilih produk --");
-				Comboitem itemAddition = new Comboitem("Addition");
-				Comboitem itemSubtraction = new Comboitem("Subtraction");
-				ComboboxListCell<PurchaseOrderDtl> cboWorkbookCode = new ComboboxListCell<PurchaseOrderDtl>(data,
-						data.getWorkbookCode(), "workbookCode");
-				cboWorkbookCode.getComponent().appendChild(itemDummy);
-				cboWorkbookCode.getComponent().appendChild(itemAddition);
-				cboWorkbookCode.getComponent().appendChild(itemSubtraction);
-				cboWorkbookCode.getComponent().setSelectedIndex(0);
-
-				SpinnerListCell<PurchaseOrderDtl> spnWorkbookSize = new SpinnerListCell<PurchaseOrderDtl>(data,
-						data.getWorkbookSize(), "workbookSize");
-				spnWorkbookSize.getComponent().setConstraint("no empty, min 0 max 150");
-
-				item.appendChild(new Listcell());
-				item.appendChild(cboWorkbookCode);
-				item.appendChild(spnWorkbookSize);
-			}
-		};
-
-		return renderer;
 	}
 
 }
