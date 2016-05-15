@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 
+import com.cupidocreative.dao.PurchaseOrderDAO;
 import com.cupidocreative.domain.PurchaseOrderDtl;
 import com.cupidocreative.domain.PurchaseOrderHdr;
 import com.cupidocreative.domain.PurchaseOrderNumber;
@@ -17,31 +18,11 @@ public class HibernateSandboxMain {
 
 	public static void main(String[] args) {
 		Set<PurchaseOrderHdr> orders = Sets.newLinkedHashSet();
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Session sessionPoNumber = HibernateUtil.getSessionFactory().openSession();
+		PurchaseOrderDAO poDAO = new PurchaseOrderDAO();
 
-		for (int i = 0; i < 2000; i++) {
+		for (int i = 0; i < 3; i++) {
 			// get PO number
-			PurchaseOrderNumber poHeaderNumber = null;
-			StringBuilder sb = new StringBuilder(" from PurchaseOrderNumber where year = ")
-					.append(Calendar.getInstance().get(Calendar.YEAR));
-			List result = sessionPoNumber.createQuery(sb.toString()).list();
-
-			if (!result.isEmpty()) {
-				poHeaderNumber = (PurchaseOrderNumber) result.get(0);
-				poHeaderNumber.setSequence(poHeaderNumber.getSequence() + 1);
-				sessionPoNumber.update(poHeaderNumber);
-			} else {
-				// no data for current year
-				poHeaderNumber = new PurchaseOrderNumber();
-				poHeaderNumber.setYear(Calendar.getInstance().get(Calendar.YEAR));
-				poHeaderNumber.setSequence(1);
-				sessionPoNumber.save(poHeaderNumber);
-			}
-
-			sessionPoNumber.flush();
-
-			System.out.println(poHeaderNumber);
+			PurchaseOrderNumber poHeaderNumber = poDAO.getPoNumber();
 
 			PurchaseOrderHdr order = new PurchaseOrderHdr();
 			order.setEmail((i % 2 == 0 ? "xxx@gmail.com" : "yyy@yahoo.com"));
@@ -63,14 +44,11 @@ public class HibernateSandboxMain {
 			order.setCreationDate(new Date());
 			order.setLastUpdateDate(new Date());
 			order.setLastUpdatedBy(-1);
-			session.save(order);
-			session.flush();
+
+			poDAO.save(order);
 		}
-
-		session.close();
-		sessionPoNumber.close();
-
-		HibernateUtil.close();
+		
+		HibernateUtil.closeSessionFactory();
 	}
 
 }

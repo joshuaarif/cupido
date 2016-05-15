@@ -53,6 +53,27 @@ public class PurchaseOrderHdr implements Serializable {
 	@Column(name = "last_updated_by")
 	private int lastUpdatedBy;
 
+	@Column(name = "promo_code", length = 25)
+	private String promoCode;
+
+	@Column(name = "price_base", length = 8)
+	private int priceBase;
+
+	/**
+	 * 0 to 100
+	 */
+	@Column(name = "discount", length = 3)
+	private byte discount;
+
+	@Column(name = "price_after_disc", length = 8)
+	private int priceAfterDisc;
+
+	@Column(name = "price_admin_fee", length = 4)
+	private int priceAdminFee;
+
+	@Column(name = "price_invoice", length = 8)
+	private int priceInvoice;
+
 	/**
 	 * Payment status, apakah sudah diterima atau belum. Urutannya : NEW > PAID,
 	 * atau NEW > CANCEL
@@ -69,46 +90,13 @@ public class PurchaseOrderHdr implements Serializable {
 
 	public void addOrderDetail(PurchaseOrderDtl orderDtl) {
 		getPoDetails().add(orderDtl);
+
+		setPriceBase(getPriceBase() + orderDtl.getPriceBase());
 	}
 
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPoNumber() {
-		return poNumber;
-	}
-
-	public void setPoNumber(String poNumber) {
-		this.poNumber = poNumber;
-	}
-
-	public List<PurchaseOrderDtl> getPoDetails() {
-		return poDetails;
-	}
-
-	public void setPoDetails(List<PurchaseOrderDtl> poDetails) {
-		this.poDetails = poDetails;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((poNumber == null) ? 0 : poNumber.hashCode());
-		return result;
+	private void calculatePrices() {
+		this.priceAfterDisc = (int) Math.floor(priceBase * ((100 - discount) / 100));
+		this.priceInvoice = this.priceAfterDisc + priceAdminFee;
 	}
 
 	@Override
@@ -128,59 +116,157 @@ public class PurchaseOrderHdr implements Serializable {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("PurchaseOrderHdr [id=").append(id).append(", email=").append(email).append(", poNumber=")
-				.append(poNumber).append(", poDetails=").append(poDetails).append("]");
-		return builder.toString();
+	public int getCreatedBy() {
+		return createdBy;
 	}
 
 	public Date getCreationDate() {
 		return creationDate;
 	}
 
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
+	public float getDiscount() {
+		return discount;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	public Date getLastUpdateDate() {
 		return lastUpdateDate;
 	}
 
-	public void setLastUpdateDate(Date lastUpdateDate) {
-		this.lastUpdateDate = lastUpdateDate;
-	}
-
-	public int getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(int createdBy) {
-		this.createdBy = createdBy;
-	}
-
 	public int getLastUpdatedBy() {
 		return lastUpdatedBy;
-	}
-
-	public void setLastUpdatedBy(int lastUpdatedBy) {
-		this.lastUpdatedBy = lastUpdatedBy;
 	}
 
 	public String getPayment_status() {
 		return payment_status;
 	}
 
-	public void setPayment_status(String payment_status) {
-		this.payment_status = payment_status;
+	public List<PurchaseOrderDtl> getPoDetails() {
+		return poDetails;
+	}
+
+	public String getPoNumber() {
+		return poNumber;
+	}
+
+	public int getPriceAdminFee() {
+		return priceAdminFee;
+	}
+
+	public int getPriceAfterDisc() {
+		return priceAfterDisc;
+	}
+
+	public int getPriceBase() {
+		return priceBase;
+	}
+
+	public int getPriceInvoice() {
+		return priceInvoice;
 	}
 
 	public String getProcessStatus() {
 		return processStatus;
 	}
 
+	public String getPromoCode() {
+		return promoCode;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((poNumber == null) ? 0 : poNumber.hashCode());
+		return result;
+	}
+
+	public void setCreatedBy(int createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public void setDiscount(byte discount) {
+		this.discount = discount;
+		calculatePrices();
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setLastUpdateDate(Date lastUpdateDate) {
+		this.lastUpdateDate = lastUpdateDate;
+	}
+
+	public void setLastUpdatedBy(int lastUpdatedBy) {
+		this.lastUpdatedBy = lastUpdatedBy;
+	}
+
+	public void setPayment_status(String payment_status) {
+		this.payment_status = payment_status;
+	}
+
+	public void setPoDetails(List<PurchaseOrderDtl> poDetails) {
+		int totalBasePrice = 0;
+		this.poDetails = poDetails;
+
+		for (PurchaseOrderDtl dtl : poDetails) {
+			totalBasePrice += dtl.getPriceBase();
+		}
+
+		setPriceBase(totalBasePrice);
+	}
+
+	public void setPoNumber(String poNumber) {
+		this.poNumber = poNumber;
+	}
+
+	public void setPriceAdminFee(int priceAdminFee) {
+		this.priceAdminFee = priceAdminFee;
+		calculatePrices();
+	}
+
+	public void setPriceAfterDisc(int priceAfterDisc) {
+		this.priceAfterDisc = priceAfterDisc;
+	}
+
+	public void setPriceBase(int priceBase) {
+		this.priceBase = priceBase;
+		calculatePrices();
+	}
+
+	public void setPriceInvoice(int priceInvoice) {
+		this.priceInvoice = priceInvoice;
+	}
+
 	public void setProcessStatus(String processStatus) {
 		this.processStatus = processStatus;
+	}
+
+	public void setPromoCode(String promoCode) {
+		this.promoCode = promoCode;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PurchaseOrderHdr [id=").append(id).append(", email=").append(email).append(", poNumber=")
+				.append(poNumber).append(", poDetails=").append(poDetails).append("]");
+		return builder.toString();
 	}
 }
