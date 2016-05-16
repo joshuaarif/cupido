@@ -53,7 +53,6 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 	private static final String PDF_SUBJECT = "Buku Latihan Cupido Creative, lihat lengkapnya di www.cupidocreative.com";
 
 	private static final long serialVersionUID = 1892887526478255535L;
-	private static final String GMAIL_USER = "me";
 
 	/**
 	 * Max attachment size in one gmail, 15 MB
@@ -155,9 +154,9 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 
 				if (totalSize < MAX_ATTACHMENT_SIZE) {
 					LOG.info("Sending single mail to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
-					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER, emailSubject, emailBody,
-							tempFiles);
-					gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GmailSender.GMAIL_USER,
+							emailSubject, emailBody, tempFiles);
+					gmailSender.sendGmailMessage(GmailSender.getGmailService(), GmailSender.GMAIL_USER, email);
 
 					for (File attachment : tempFiles) {
 						Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
@@ -166,9 +165,9 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 					LOG.info("Sending multiple mails to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 
 					for (File attachment : tempFiles) {
-						email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GMAIL_USER, emailSubject,
-								emailBody, attachment);
-						gmailSender.sendGmailMessage(GmailSender.getGmailService(), GMAIL_USER, email);
+						email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GmailSender.GMAIL_USER,
+								emailSubject, emailBody, attachment);
+						gmailSender.sendGmailMessage(GmailSender.getGmailService(), GmailSender.GMAIL_USER, email);
 
 						Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
 					}
