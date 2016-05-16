@@ -42,7 +42,8 @@ public class PurchaseOrderAcceptedTask implements Callable<TaskStatus>, Serializ
 		String emailBody = StringTemplateUtil.createFromST("mail/email_body.html", StringTemplateUtil.DEFAULT_DELIMITER,
 				stValues);
 
-		MimeMessage email = mailUtil.createEmail(poHeader.getEmail(), GmailSender.GMAIL_USER, emailSubject, emailBody);
+		MimeMessage email = mailUtil.createHtmlEmail(poHeader.getEmail(), GmailSender.GMAIL_USER, emailSubject,
+				emailBody);
 		gmailSender.sendGmailMessage(email);
 
 		return TaskStatus.SUCCESS;
