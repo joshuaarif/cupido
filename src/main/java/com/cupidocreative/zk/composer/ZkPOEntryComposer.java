@@ -4,8 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.InputEvent;
@@ -15,6 +13,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
@@ -23,16 +22,17 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
+import org.zkoss.zul.Spinner;
 import org.zkoss.zul.Textbox;
 
 import com.cupidocreative.common.PaymentStatus;
 import com.cupidocreative.common.ProcessStatus;
-import com.cupidocreative.hibernate.HibernateUtil;
 import com.cupidocreative.hibernate.dao.PurchaseOrderDAO;
 import com.cupidocreative.hibernate.domain.PurchaseOrderDtl;
 import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.cupidocreative.hibernate.domain.PurchaseOrderNumber;
 import com.cupidocreative.zk.ui.ComboboxListCell;
+import com.cupidocreative.zk.ui.LabelListCell;
 import com.cupidocreative.zk.ui.SpinnerListCell;
 import com.cupidocreative.zk.ui.TabularEntry;
 import com.google.common.collect.Lists;
@@ -87,47 +87,60 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 	private ListitemRenderer<PurchaseOrderDtl> getPODetailRenderer() {
 		ListitemRenderer<PurchaseOrderDtl> renderer = new ListitemRenderer<PurchaseOrderDtl>() {
 
+			private void renderPrice(Combobox cboWorkbookCode, Spinner spnWorkbookSize, Label lblPrice) {
+				if (cboWorkbookCode.getSelectedIndex() == 0) {
+					// dummy
+					lblPrice.setValue("0");
+				} else {
+					int value = spnWorkbookSize.getValue();
+					lblPrice.setValue("Rp " + (value * PurchaseOrderDtl.PRICE_BASE_PER_PAGE));
+				}
+
+			}
+
 			@Override
 			public void render(Listitem item, PurchaseOrderDtl data, int index) throws Exception {
 				// item dummy ini harus ada, karena entah gimana, user harus
-				// pilih dulu itemnya, baru commbobox nya bisa dimapping ke pojo
+				// pilih dulu itemnya, baru combobox nya bisa dimapping ke pojo
 				Comboitem itemDummy = new Comboitem("-- Pilih produk --");
 				Comboitem itemAddition = new Comboitem("Addition");
 				Comboitem itemSubtraction = new Comboitem("Subtraction");
 				ComboboxListCell<PurchaseOrderDtl> cboWorkbookCode = new ComboboxListCell<PurchaseOrderDtl>(data,
 						data.getWorkbookCode(), "workbookCode");
+				SpinnerListCell<PurchaseOrderDtl> spnWorkbookSize = new SpinnerListCell<PurchaseOrderDtl>(data,
+						data.getWorkbookSize(), "workbookSize");
+				LabelListCell<PurchaseOrderDtl> lblPrice = new LabelListCell<PurchaseOrderDtl>(data,
+						Integer.toString(data.getPriceBase()), "priceBase");
+
 				cboWorkbookCode.getComponent().appendChild(itemDummy);
 				cboWorkbookCode.getComponent().appendChild(itemAddition);
 				cboWorkbookCode.getComponent().appendChild(itemSubtraction);
 				cboWorkbookCode.getComponent().setSelectedIndex(0);
+				cboWorkbookCode.getComponent().setReadonly(true);
 
-				SpinnerListCell<PurchaseOrderDtl> spnWorkbookSize = new SpinnerListCell<PurchaseOrderDtl>(data,
-						data.getWorkbookSize(), "workbookSize");
-				spnWorkbookSize.getComponent().setConstraint("no empty, min 0 max 150");
-				spnWorkbookSize.getComponent().setCols(4);
-				spnWorkbookSize.addEventListener(Events.ON_BLUR, new EventListener<Event>() {
+				cboWorkbookCode.getComponent().addEventListener(Events.ON_CHANGE, new EventListener<InputEvent>() {
 					@Override
-					public void onEvent(Event event) throws Exception {
-						int value = spnWorkbookSize.getValue();
-
-						System.out.println(value * PurchaseOrderDtl.PRICE_BASE_PER_PAGE);
-						txtEmail.setValue("blur " + value * 111);
+					public void onEvent(InputEvent event) throws Exception {
+						Combobox combobox = (Combobox) event.getTarget();
+						renderPrice(combobox, spnWorkbookSize.getComponent(), lblPrice.getComponent());
 					}
 				});
 
-				spnWorkbookSize.addEventListener("onChange", new EventListener<InputEvent>() {
+				spnWorkbookSize.getComponent().setConstraint("no empty, min 0 max 150");
+				spnWorkbookSize.getComponent().setCols(4);
+
+				spnWorkbookSize.getComponent().addEventListener(Events.ON_CHANGE, new EventListener<InputEvent>() {
 					@Override
 					public void onEvent(InputEvent event) throws Exception {
-						int value = Integer.parseInt(event.getValue());
-
-						System.out.println("Value from event : " + value * 400);
-						txtEmail.setValue("change " + value * 111);
+						Spinner spinner = (Spinner) event.getTarget();
+						renderPrice(cboWorkbookCode.getComponent(), spinner, lblPrice.getComponent());
 					}
 				});
 
 				item.appendChild(new Listcell());
 				item.appendChild(cboWorkbookCode);
 				item.appendChild(spnWorkbookSize);
+				item.appendChild(lblPrice);
 			}
 		};
 
@@ -150,7 +163,6 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 		lstPoDetails.getValue();
 
 		PurchaseOrderHdr poHeader = populatePurchaseOrder();
-
 		// HibernateUtil.close();
 	}
 
