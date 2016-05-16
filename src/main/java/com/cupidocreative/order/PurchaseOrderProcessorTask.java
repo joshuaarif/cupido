@@ -156,7 +156,7 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 					LOG.info("Sending single mail to : " + poHeader.getEmail() + ", PO : " + poHeader.getPoNumber());
 					email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GmailSender.GMAIL_USER,
 							emailSubject, emailBody, tempFiles);
-					gmailSender.sendGmailMessage(GmailSender.getGmailService(), GmailSender.GMAIL_USER, email);
+					gmailSender.sendGmailMessage(email);
 
 					for (File attachment : tempFiles) {
 						Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
@@ -167,7 +167,7 @@ public class PurchaseOrderProcessorTask implements Callable<TaskStatus>, Seriali
 					for (File attachment : tempFiles) {
 						email = mailUtil.createEmailWithAttachment(poHeader.getEmail(), GmailSender.GMAIL_USER,
 								emailSubject, emailBody, attachment);
-						gmailSender.sendGmailMessage(GmailSender.getGmailService(), GmailSender.GMAIL_USER, email);
+						gmailSender.sendGmailMessage(email);
 
 						Files.deleteIfExists(FileSystems.getDefault().getPath(attachment.getPath()));
 					}

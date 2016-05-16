@@ -31,7 +31,7 @@ import com.google.api.services.gmail.model.Message;
 public class GmailSender {
 
 	private static final Log LOG = LogFactory.getLog(GmailSender.class);
-	public static final String GMAIL_USER="me";
+	public static final String GMAIL_USER = "me";
 
 	/** Application name. */
 	private static final String APPLICATION_NAME = "Cupido Creative";
@@ -107,7 +107,7 @@ public class GmailSender {
 	 * @throws IOException
 	 * @throws MessagingException
 	 */
-	public Message createGmailMessage(MimeMessage email) throws MessagingException, IOException {
+	protected Message createGmailMessage(MimeMessage email) throws MessagingException, IOException {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		email.writeTo(bytes);
 		String encodedEmail = Base64.encodeBase64URLSafeString(bytes.toByteArray());
@@ -133,6 +133,16 @@ public class GmailSender {
 			throws MessagingException, IOException {
 		Message message = createGmailMessage(email);
 		message = service.users().messages().send(userId, message).execute();
+	}
+
+	/**
+	 * Send message using default registered sender on json
+	 * @param email
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
+	public void sendGmailMessage(MimeMessage email) throws MessagingException, IOException {
+		sendGmailMessage(getGmailService(), GMAIL_USER, email);
 	}
 
 }
