@@ -3,6 +3,8 @@ package com.cupidocreative.zk.composer;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -31,6 +33,7 @@ import com.cupidocreative.hibernate.dao.PurchaseOrderDAO;
 import com.cupidocreative.hibernate.domain.PurchaseOrderDtl;
 import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.cupidocreative.hibernate.domain.PurchaseOrderNumber;
+import com.cupidocreative.order.PurchaseOrderAcceptedTask;
 import com.cupidocreative.zk.ui.ComboboxListCell;
 import com.cupidocreative.zk.ui.LabelListCell;
 import com.cupidocreative.zk.ui.SpinnerListCell;
@@ -163,6 +166,10 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 		lstPoDetails.getValue();
 
 		PurchaseOrderHdr poHeader = populatePurchaseOrder();
+		PurchaseOrderAcceptedTask mailTask = new PurchaseOrderAcceptedTask(poHeader);
+
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		executorService.submit(mailTask);
 		// HibernateUtil.close();
 	}
 
