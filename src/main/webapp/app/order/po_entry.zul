@@ -3,31 +3,38 @@
 	<div apply="com.cupidocreative.zk.composer.ZkPOEntryComposer">
 		<include src="/app/shared/html_head.zul" />
 
-		<div sclass="row">
-			<div sclass="col-md-2">
-				<label value="Email *" />
+		<div class="row">
+			<div class="col-md-2 text-right">
+				<h:h5>
+					<label value="Email"
+						style="font-size: 11pt; font-weight: bold;" />
+				</h:h5>
 			</div>
-			<div sclass="col-md-10">
-				<textbox cols="40" maxlength="60" id="txtEmail"
+			<div class="col-md-4 input group">
+				<textbox cols="40" maxlength="50" id="txtEmail"
+					class="form-control"
 					constraint="no empty,/.+@.+\.[a-z]+/: Masukkan e-mail"
 					placeholder="email@domain.com" />
 			</div>
 		</div>
 		<div sclass="row">
-			<div sclass="col-md-2">
-				<label value="Nomor PO" />
+			<div sclass="col-md-2 text-right">
+				<h:h5>
+					<label value="Nomor PO"
+						style="font-size: 11pt; font-weight: bold;" />
+				</h:h5>
 			</div>
 			<div sclass="col-md-10">
 				<label id="lblPoNumber" />
 			</div>
 		</div>
-		<listbox id="lstPoDetails" checkmark="true"
-			use="com.cupidocreative.zk.ui.TabularEntry" hflex="min">
+		<listbox id="lstPoDetails" checkmark="true" hflex="min"
+			use="com.cupidocreative.zk.ui.TabularEntry">
 			<listhead>
 				<listheader label="" hflex="min" />
 				<listheader label="Jenis" hflex="min" />
 				<listheader label="Halaman" hflex="min" />
-				<listheader label="Harga" hflex="min" />
+				<listheader label="Harga buku" hflex="min" />
 			</listhead>
 		</listbox>
 		<hbox>
@@ -37,10 +44,88 @@
 				sclass="btn-warning" />
 			<button id="btnSubmit" label="Submit" sclass="btn-error" />
 		</hbox>
-		<hbox>
-			<label value="Total harga " />
-			<label id="lblTotalPrice" />
-		</hbox>
+		<div class="row">
+			<div class="col-md-2 text-right">
+				<h:h5>
+					<label value="Total harga"
+						style="font-size: 10pt; font-weight: bold;" />
+				</h:h5>
+			</div>
+			<div class="col-md-4 input group">
+				<h:h5>
+					<label id="lblPriceBase" 
+						style="font-size: 10pt;" />
+				</h:h5>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2 text-right">
+				<h:h5>
+					<label value="Kode promo"
+						style="font-size: 10pt; font-weight: bold;" />
+				</h:h5>
+			</div>
+			<div class="col-md-2 input group">
+				<textbox class="form-control" maxlength="20"
+					style="font-weight: bold; color: #039be5;" />
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2 text-right">
+				<h:h5>
+					<label value="Diskon"
+						style="font-size: 10pt; font-weight: bold;" />
+				</h:h5>
+			</div>
+			<div class="col-md-4 input group">
+				<h:h5>
+					<label id="lblDiscount" 
+						style="font-size: 10pt; color: #039be5;" />
+				</h:h5>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2 text-right">
+				<h:h5>
+					<label value="Harga setelah diskon"
+						style="font-size: 10pt; font-weight: bold; color: #039be5;" />
+				</h:h5>
+			</div>
+			<div class="col-md-4 input group">
+				<h:h5>
+					<label id="lblPriceAfterDisc" 
+						style="font-size: 10pt; font-weight: bold; color: #039be5;" />
+				</h:h5>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2 text-right">
+				<h:h5>
+					<label value="Biaya administrasi"
+						style="font-size: 10pt; font-weight: bold;" />
+				</h:h5>
+			</div>
+			<div class="col-md-4 input group">
+				<h:h5>
+					<label id="lblPriceAdminFee"
+						style="font-size: 10pt;" />
+				</h:h5>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2 text-right">
+				<h:h5>
+					<label value="Harga setelah diskon"
+						style="font-size: 14pt; font-weight: bold; color: #fb8c00;" />
+				</h:h5>
+			</div>
+			<div class="col-md-4 input group">
+				<h:h5>
+					<label id="lblPriceInvoice" 
+						style="font-size: 14pt; font-weight: bold; color: #fb8c00;" />
+				</h:h5>
+			</div>
+		</div>
 		<include src="/app/shared/html_body.zul" />
 	</div>
 </zk>

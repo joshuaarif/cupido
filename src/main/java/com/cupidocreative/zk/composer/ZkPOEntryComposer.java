@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -58,11 +59,26 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 	private Button btnDelPODetail;
 	@Wire
 	private TabularEntry<PurchaseOrderDtl> lstPoDetails;
+	@Wire
+	private Label lblPriceBase;
+	@Wire
+	private Label lblDiscount;
+	@Wire
+	private Label lblPriceAfterDisc;
+	@Wire
+	private Label lblPriceAdminFee;
+	@Wire
+	private Label lblPriceInvoice;
 	// end of UI Wire
 
 	private List<PurchaseOrderDtl> poDetails;
-
 	private PurchaseOrderDAO poDAO = new PurchaseOrderDAO();
+	/**
+	 * Discount in %
+	 */
+	private byte discount;
+	private int priceAdminFee;
+	private PurchaseOrderHdr poHeader;
 
 	@Override
 	public void doAfterCompose(Div comp) throws Exception {
@@ -77,6 +93,11 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 		if (lstPoDetails.getRows() == 0) {
 			lstPoDetails.addRow();
 		}
+
+		if (this.poHeader == null) {
+			this.poHeader = new PurchaseOrderHdr();
+		}
+		this.priceAdminFee = ThreadLocalRandom.current().nextInt(1, 500);
 	}
 
 	private ListModel<PurchaseOrderDtl> getPODetailModel() {
@@ -90,15 +111,37 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 	private ListitemRenderer<PurchaseOrderDtl> getPODetailRenderer() {
 		ListitemRenderer<PurchaseOrderDtl> renderer = new ListitemRenderer<PurchaseOrderDtl>() {
 
-			private void renderPrice(Combobox cboWorkbookCode, Spinner spnWorkbookSize, Label lblPrice) {
+			private void calculatePrice(Combobox cboWorkbookCode, Spinner spnWorkbookSize, Label lblPrice) {
+				int totalPriceBase = 0;
+
 				if (cboWorkbookCode.getSelectedIndex() == 0) {
 					// dummy
 					lblPrice.setValue("0");
 				} else {
 					int value = spnWorkbookSize.getValue();
-					lblPrice.setValue("Rp " + (value * PurchaseOrderDtl.PRICE_BASE_PER_PAGE));
+					int price = value * PurchaseOrderDtl.PRICE_BASE_PER_PAGE;
+					lblPrice.setValue("Rp " + price);
 				}
 
+				for (int i = 0; i < lstPoDetails.getValue().size(); i++) {
+					PurchaseOrderDtl poDetail = lstPoDetails.getValue().get(i);
+
+					if (!poDetail.isEmpty()) {
+						totalPriceBase += poDetail.getPriceBase();
+					}
+				}
+
+				ZkPOEntryComposer.this.poHeader.setPriceBase(totalPriceBase);
+				ZkPOEntryComposer.this.poHeader.setDiscount(discount);
+				ZkPOEntryComposer.this.poHeader.setPriceAdminFee(priceAdminFee);
+
+				ZkPOEntryComposer.this.lblPriceBase.setValue("Rp " + ZkPOEntryComposer.this.poHeader.getPriceBase());
+				ZkPOEntryComposer.this.lblDiscount.setValue("Rp " + ZkPOEntryComposer.this.poHeader.getPriceBase());
+				ZkPOEntryComposer.this.lblPriceAfterDisc
+						.setValue("Rp " + ZkPOEntryComposer.this.poHeader.getPriceBase());
+				ZkPOEntryComposer.this.lblPriceAdminFee
+						.setValue("Rp " + ZkPOEntryComposer.this.poHeader.getPriceBase());
+				ZkPOEntryComposer.this.lblPriceInvoice.setValue("Rp " + ZkPOEntryComposer.this.poHeader.getPriceBase());
 			}
 
 			@Override
@@ -125,7 +168,7 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 					@Override
 					public void onEvent(InputEvent event) throws Exception {
 						Combobox combobox = (Combobox) event.getTarget();
-						renderPrice(combobox, spnWorkbookSize.getComponent(), lblPrice.getComponent());
+						calculatePrice(combobox, spnWorkbookSize.getComponent(), lblPrice.getComponent());
 					}
 				});
 
@@ -136,7 +179,7 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 					@Override
 					public void onEvent(InputEvent event) throws Exception {
 						Spinner spinner = (Spinner) event.getTarget();
-						renderPrice(cboWorkbookCode.getComponent(), spinner, lblPrice.getComponent());
+						calculatePrice(cboWorkbookCode.getComponent(), spinner, lblPrice.getComponent());
 					}
 				});
 
@@ -165,7 +208,7 @@ public class ZkPOEntryComposer extends SelectorComposer<Div> {
 		// set model nya nanti, PO detail dummy jangan diproses
 		lstPoDetails.getValue();
 
-		PurchaseOrderHdr poHeader = populatePurchaseOrder();
+		this.poHeader = populatePurchaseOrder();
 		PurchaseOrderAcceptedTask mailTask = new PurchaseOrderAcceptedTask(poHeader);
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
