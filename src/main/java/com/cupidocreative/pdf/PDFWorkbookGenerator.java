@@ -33,7 +33,7 @@ public class PDFWorkbookGenerator {
 			String subject, String footerImagePath) {
 		File file = new File(rootWorksheetFolder);
 		File target = new File(targetFile);
-		PDFMerger pdfMerger = new PDFMerger(title, creator, subject, footerImagePath);
+		PDFMerger pdfMerger = new PDFMerger(title, creator, subject);
 
 		// original file
 		List<File> worksheetFiles = Lists.newArrayList(file.listFiles());
@@ -88,7 +88,7 @@ public class PDFWorkbookGenerator {
 		}
 
 		try {
-			pdfMerger.merge(sources, target, true);
+			pdfMerger.merge(sources, target, true, footerImagePath);
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
 		}
