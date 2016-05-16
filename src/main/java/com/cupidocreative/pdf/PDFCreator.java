@@ -15,7 +15,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 public class PDFCreator {
 
 	private static final int KEY_LENGTH = 128;
-	
+
 	private String pdfAdminPassword = "12345678Aa";
 	private String creator;
 	private String subject;
@@ -23,6 +23,9 @@ public class PDFCreator {
 
 	public PDFCreator(String title, String creator, String subject) {
 		super();
+
+		System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
+
 		this.title = title;
 		this.creator = creator;
 		this.subject = subject;
