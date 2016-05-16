@@ -15,6 +15,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import com.cupidocreative.hibernate.HibernateUtil;
+import com.cupidocreative.hibernate.domain.PurchaseOrderDtl;
 import com.cupidocreative.hibernate.domain.PurchaseOrderHdr;
 import com.cupidocreative.hibernate.domain.PurchaseOrderNumber;
 import com.google.common.collect.Lists;
@@ -22,6 +23,40 @@ import com.google.common.collect.Lists;
 public class PurchaseOrderDAO {
 
 	private static final Log LOG = LogFactory.getLog(PurchaseOrderDAO.class);
+
+	@SuppressWarnings("unchecked")
+	public List<PurchaseOrderHdr> findPoHeaders(String email, String poNumber, Set<String> paymentStatus,
+			Set<String> processStatus) {
+		List<PurchaseOrderHdr> result = null;
+		Session session = HibernateUtil.openSession();
+		Criteria c = session.createCriteria(PurchaseOrderHdr.class);
+
+		if (StringUtils.isNotEmpty(email)) {
+			c.add(Restrictions.eq("email", email));
+		}
+
+		if (StringUtils.isNotEmpty(poNumber)) {
+			c.add(Restrictions.ilike("poNumber", poNumber, MatchMode.ANYWHERE));
+		}
+
+		if (paymentStatus != null && !paymentStatus.isEmpty()) {
+			paymentStatus.forEach(s -> {
+				c.add(Restrictions.eq("paymentStatus", s));
+			});
+		}
+
+		if (processStatus != null && !processStatus.isEmpty()) {
+			processStatus.forEach(s -> {
+				c.add(Restrictions.eq("processStatus", s));
+			});
+		}
+
+		c.addOrder(Order.desc("id"));
+
+		result = (List<PurchaseOrderHdr>) c.list();
+
+		return result == null ? Lists.newArrayList() : result;
+	}
 
 	public PurchaseOrderNumber getPoNumber() {
 		PurchaseOrderNumber poHeaderNumber = null;
@@ -75,6 +110,16 @@ public class PurchaseOrderDAO {
 		}
 	}
 
+	public void update(PurchaseOrderDtl orderDtl) {
+		try (Session session = HibernateUtil.openSession()) {
+			Transaction t = session.beginTransaction();
+			session.update(orderDtl);
+			t.commit();
+		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
+		}
+	}
+
 	public void update(PurchaseOrderHdr order) {
 		try (Session session = HibernateUtil.openSession()) {
 			Transaction t = session.beginTransaction();
@@ -82,40 +127,7 @@ public class PurchaseOrderDAO {
 			order.getPoDetails().forEach(dtl -> session.saveOrUpdate(dtl));
 			t.commit();
 		} catch (Exception ex) {
+			LOG.error(ex.getMessage());
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<PurchaseOrderHdr> findPoHeaders(String email, String poNumber, Set<String> paymentStatus,
-			Set<String> processStatus) {
-		List<PurchaseOrderHdr> result = null;
-		Session session = HibernateUtil.openSession();
-		Criteria c = session.createCriteria(PurchaseOrderHdr.class);
-
-		if (StringUtils.isNotEmpty(email)) {
-			c.add(Restrictions.eq("email", email));
-		}
-
-		if (StringUtils.isNotEmpty(poNumber)) {
-			c.add(Restrictions.ilike("poNumber", poNumber, MatchMode.ANYWHERE));
-		}
-
-		if (paymentStatus != null && !paymentStatus.isEmpty()) {
-			paymentStatus.forEach(s -> {
-				c.add(Restrictions.eq("paymentStatus", s));
-			});
-		}
-
-		if (processStatus != null && !processStatus.isEmpty()) {
-			processStatus.forEach(s -> {
-				c.add(Restrictions.eq("processStatus", s));
-			});
-		}
-
-		c.addOrder(Order.desc("id"));
-
-		result = (List<PurchaseOrderHdr>) c.list();
-
-		return result == null ? Lists.newArrayList() : result;
 	}
 }
