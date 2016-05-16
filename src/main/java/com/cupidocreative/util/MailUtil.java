@@ -65,6 +65,8 @@ public class MailUtil {
 
 		Multipart multipart = new MimeMultipart();
 		multipart.addBodyPart(mimeBodyPart);
+		
+		email.setContent(multipart);
 
 		return email;
 	}
