@@ -25,6 +25,7 @@
 		<org.hibernate.annotations.version>3.5.6-Final</org.hibernate.annotations.version>
 		<commons.lang3.version>3.4</commons.lang3.version>
 		<zkoss.version>8.0.1.1</zkoss.version>
+		<zkoss.bootstrap.version>1.0.0</zkoss.bootstrap.version>
 		<jetty.version>9.2.16.v20160414</jetty.version>
 	</properties>
 
@@ -176,6 +177,11 @@
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zkmax</artifactId>
 			<version>${zkoss.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.zkoss.addons</groupId>
+			<artifactId>zk-bootstrap</artifactId>
+			<version>${zkoss.bootstrap.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
